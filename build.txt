@@ -2,24 +2,71 @@
 Building MOM6
 =============
 
+:author: Marshall Ward
+:description: Overview of MOM6 build process
+:date: 2022-10-17
+:url: https://marshallward.org/mom6workshop/build.html
+:preface:
+   TODO
 
-Dependencies
-============
 
-- netCDF (preferably 4.x)
-- MPI (OpenMPI, MPICH, ...)
+Preparation
+===========
+
+- Fortran compiler
+
+   - GCC Fortran (``gfortran``)
+
+   - Intel Fortran (``ifort``) on HPC
+
+   - ``ftn`` wrapper (Cray)
+
+- MPI library
+
+   - Open MPI (usually faster)
+
+   - MPICH (usually safer, esp on Macs)
+
+- netCDF for I/O
 
 
-Installation
-============
+Gaea
+----
 
-- platform dependent, not much can be said here
+HPC systems use environment modules::
 
-  - Ubuntu
-  - Fedora
-  - Other Linux...?
-  - MacOS
-  - Windows (WSL)
+   # Remove active modules
+   module unload PrgEnv-gnu PrgEnv-intel PrgEnv-pgi
+
+   module load PrgEnv-gnu
+   module swap gcc gcc/9.3.0
+   module load cray-netcdf
+
+
+Ubuntu/Debian
+-------------
+
+Package installation::
+
+   apt install make
+   apt install gfortran
+   apt install netcdf-bin
+   apt install libnetcdf-dev
+   apt install libnetcdff-dev
+   apt install openmpi-bin
+   apt install libopenmpi-dev
+
+
+MacOS
+-----
+
+MacOS is a minefield!  But Homebrew has the best chance::
+
+   brew install make
+   brew install gfortran
+   brew install mpich
+   brew install netcdf
+   brew install netcdf-fortran
 
 
 Get the Code
@@ -27,7 +74,8 @@ Get the Code
 
 Get the MOM6-examples monorepo::
 
-   $ git clone --recursive https://github.com/NOAA-GFDL/MOM6-examples.git
+   $ git clone https://github.com/NOAA-GFDL/MOM6-examples.git \
+      --recursive
 
 Verify submodules::
 
@@ -35,8 +83,21 @@ Verify submodules::
    $ git submodule update --init --recursive
 
 
-Setup FMS
+GFDL Tools
+==========
+
+``list_paths``
+   Generates a list of files to be compiled (usually in ``path_names``)
+
+``mkmf``
+   Generates a Makefile from ``path_names`` and a platform template (e.g.
+   ``linux-gnu.mk``)
+
+
+FMS Setup
 =========
+
+FMS is a climate model framework used at GFDL
 
 Create the ``path_names`` manifest:
 
@@ -44,30 +105,46 @@ Create the ``path_names`` manifest:
 
    $ mkdir -p build/fms
    $ cd build/fms
-   $ ../../src/mkmf/bin/list_paths \
-      -l ../../src/FMS
+   $ ../../src/mkmf/bin/list_paths -l ../../src/FMS
+
+Sample output::
+
+   ../../src/FMS/horiz_interp/horiz_interp_bilinear.F90
+   ../../src/FMS/horiz_interp/horiz_interp_type.F90
+   ../../src/FMS/horiz_interp/horiz_interp_bicubic.F90
+   ../../src/FMS/horiz_interp/horiz_interp.F90
+   (...)
 
 
 ``list_paths``
 ==============
 
-TODO (explain tool and flags)
+``-l``
+   Follow symbolic links (needed for MOM6)
+
+``<paths>``
+   Directories to search for source
+
+``-o <out_file>``
+     Write report to file ``<out_file>``
+
+Default is ``path_names``
 
 
-Build the FMS library
-=====================
+Build FMS
+=========
 
 Generate the Makefile:
 
 .. code:: sh
 
-   $ ../../../../src/mkmf/bin/mkmf \
-      -t ../../../../src/mkmf/templates/linux-gnu.mk \
+   $ ../../src/mkmf/bin/mkmf \
+      -t ../../src/mkmf/templates/linux-gnu.mk \
       -p libfms.a \
-      -c "-Duse_libMPI -Duse_netCDF -DMACOS" \
+      -c "-Duse_libMPI -Duse_netCDF" \
       path_names
 
-Make it::
+and build::
 
    $ make NETCDF=3 REPRO=1 libfms.a -j
 
@@ -75,15 +152,18 @@ Make it::
 ``mkmf``
 ========
 
-"make Makefile"
+``-t template``
+   Select a MKMF template file (``linux-gnu.mk``)
 
-TODO: flags...
+``-p program``
+   Target program (``MOM6``) or library (``libfms.a``)
+
+``-c CPPDEFS``
+   Preprocessor defines (``-Duse_netCDF``)
 
 
-Prepare MOM6
-============
-
-Same deal:
+MOM6 Setup
+==========
 
 .. code:: sh
 
@@ -105,6 +185,22 @@ Manifest:
          ../../src/MOM6/src/*/*/
 
 
+MOM6 paths
+==========
+
+``config_src/infra/FMS1``
+   Framework (I/O, parallelization, output format, etc.)
+
+``config_src/memory/dynamic_symmetric``
+   Memory layout (see "Internals" session)
+
+``config_src/drivers/solo_driver``
+   The "program": solo (ocean-only), coupled, etc.
+
+``config_src/external``
+   External packages (BGC, data assimilation, etc)
+
+
 Build MOM6
 ==========
 
@@ -112,13 +208,40 @@ Create Makefile:
 
 .. code:: sh
 
-   $ ../../../../src/mkmf/bin/mkmf \
-      -t ../../../../src/mkmf/templates/linux-gnu.mk \
-      -o '-I../../shared/repro' \
+   $ ../../src/mkmf/bin/mkmf \
+      -t ../../src/mkmf/templates/linux-gnu.mk \
+      -o '-I../fms' \
       -p MOM6 \
-      -l '-L../../shared/repro -lfms' \
+      -l '-L../fms -lfms' \
       path_names
 
 Make it::
 
    $ make NETCDF=3 REPRO=1 MOM6 -j
+
+
+mkmf part deux
+==============
+
+``-o``
+   "Other flags", added to compiler (``-I../../shared/repro``)
+
+``-l``
+   Linker flags (``-L../../shared/repro -lfms``)
+
+
+Final Product
+=============
+
+Test the executable::
+
+   $ ./MOM6
+
+If you see some output like this::
+
+   FATAL: get_ascii_file_num_lines: File input.nml does not exist.
+   
+   
+   FATAL: get_ascii_file_num_lines: File input.nml does not exist.
+
+then you are ready

@@ -1,0 +1,13 @@
+===========================
+MOM6 Workshop Presentations
+===========================
+
+* `Building MOM6`_
+* `Contributing I`_
+* `Contributing II`_
+* `MOM6 Internals`_
+
+.. _Building MOM6: build.html
+.. _Contributing I: contrib1.html
+.. _Contributing II: contrib2.html
+.. _MOM6 Internals: internals.html

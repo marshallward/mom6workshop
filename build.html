@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Marshall Ward">
+  <meta name="dcterms.date" content="2022-10-17">
+  <title>Building MOM6</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="./reveal.js/dist/reveal.css">
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="./reveal.js/css/theme/gfdl.css" id="theme">
+  <!-- Explicitly add zenburn for highlight support -->
+  <link rel="stylesheet" href="./reveal.js/plugin/highlight/zenburn.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? './reveal.js/css/print/pdf.scss' : './reveal.js/css/print/paper.scss';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="./reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <base href="./index.html">
+</head>
+<body>
+  <div class="reveal"
+       style="background: url(img/bg_gfdl.jpg);
+              background-size: cover;">
+
+    <header style="width: 10vh; position: absolute; bottom: 2vh; right: 2vh;">
+      <img src="img/noaa_logo.png">
+    </header>
+
+    <footer style="font-size: 1pc; position: absolute; bottom: 2%; left: 2%;">
+      <code><p><a href="https://marshallward.org/mom6workshop/build.html">https://marshallward.org/mom6workshop/build.html</a></p></code>
+    </footer>
+
+    <div class="slides">
+
+<section id="title-slide">
+  <!--div class="reveal" style="text-align: right;">
+    <img src="img/noaa_logo.png"
+         style="background: none; border: none; box-shadow: none;
+         width: 30%"
+         alt="NCI">
+  </div-->
+  <h1 class="title">Building MOM6</h1>
+  <p class="author" style="text-align: right;">Marshall Ward</p>
+  <p class="date" style="text-align: right;">2022-10-17</p>
+  <!-- Currently cannot add notes to a title slide, so have to do manually-->
+  <aside class="notes">
+    <p>TODO</p>
+  </aside>
+</section>
+
+<section>
+<section id="preparation" class="title-slide slide level1">
+<h1>Preparation</h1>
+<ul>
+<li><p>Fortran compiler</p>
+<ul>
+<li>GCC Fortran (<code>gfortran</code>)</li>
+<li>Intel Fortran (<code>ifort</code>) on HPC</li>
+<li><code>ftn</code> wrapper (Cray)</li>
+</ul></li>
+<li><p>MPI library</p>
+<ul>
+<li>Open MPI (usually faster)</li>
+<li>MPICH (usually safer, esp on Macs)</li>
+</ul></li>
+<li><p>netCDF for I/O</p></li>
+</ul>
+</section>
+<section id="gaea" class="slide level2">
+<h2>Gaea</h2>
+<p>HPC systems use environment modules:</p>
+<pre><code># Remove active modules
+module unload PrgEnv-gnu PrgEnv-intel PrgEnv-pgi
+
+module load PrgEnv-gnu
+module swap gcc gcc/9.3.0
+module load cray-netcdf</code></pre>
+</section>
+<section id="ubuntudebian" class="slide level2">
+<h2>Ubuntu/Debian</h2>
+<p>Package installation:</p>
+<pre><code>apt install make
+apt install gfortran
+apt install netcdf-bin
+apt install libnetcdf-dev
+apt install libnetcdff-dev
+apt install openmpi-bin
+apt install libopenmpi-dev</code></pre>
+</section>
+<section id="macos" class="slide level2">
+<h2>MacOS</h2>
+<p>MacOS is a minefield! But Homebrew has the best chance:</p>
+<pre><code>brew install make
+brew install gfortran
+brew install mpich
+brew install netcdf
+brew install netcdf-fortran</code></pre>
+</section></section>
+<section id="get-the-code" class="title-slide slide level1">
+<h1>Get the Code</h1>
+<p>Get the MOM6-examples monorepo:</p>
+<pre><code>$ git clone https://github.com/NOAA-GFDL/MOM6-examples.git \
+   --recursive</code></pre>
+<p>Verify submodules:</p>
+<pre><code>$ cd MOM6-examples
+$ git submodule update --init --recursive</code></pre>
+</section>
+
+<section id="gfdl-tools" class="title-slide slide level1">
+<h1>GFDL Tools</h1>
+<dl>
+<dt><code>list_paths</code></dt>
+<dd><p>Generates a list of files to be compiled (usually in <code>path_names</code>)</p>
+</dd>
+<dt><code>mkmf</code></dt>
+<dd><p>Generates a Makefile from <code>path_names</code> and a platform template (e.g. <code>linux-gnu.mk</code>)</p>
+</dd>
+</dl>
+</section>
+
+<section id="fms-setup" class="title-slide slide level1">
+<h1>FMS Setup</h1>
+<p>FMS is a climate model framework used at GFDL</p>
+<p>Create the <code>path_names</code> manifest:</p>
+<pre class="sh"><code>$ mkdir -p build/fms
+$ cd build/fms
+$ ../../src/mkmf/bin/list_paths -l ../../src/FMS</code></pre>
+<p>Sample output:</p>
+<pre><code>../../src/FMS/horiz_interp/horiz_interp_bilinear.F90
+../../src/FMS/horiz_interp/horiz_interp_type.F90
+../../src/FMS/horiz_interp/horiz_interp_bicubic.F90
+../../src/FMS/horiz_interp/horiz_interp.F90
+(...)</code></pre>
+</section>
+
+<section id="list_paths" class="title-slide slide level1">
+<h1><code>list_paths</code></h1>
+<dl>
+<dt><code>-l</code></dt>
+<dd><p>Follow symbolic links (needed for MOM6)</p>
+</dd>
+<dt><code>&lt;paths&gt;</code></dt>
+<dd><p>Directories to search for source</p>
+</dd>
+<dt><code>-o &lt;out_file&gt;</code></dt>
+<dd><p>Write report to file <code>&lt;out_file&gt;</code></p>
+</dd>
+</dl>
+<p>Default is <code>path_names</code></p>
+</section>
+
+<section id="build-fms" class="title-slide slide level1">
+<h1>Build FMS</h1>
+<p>Generate the Makefile:</p>
+<pre class="sh"><code>$ ../../src/mkmf/bin/mkmf \
+   -t ../../src/mkmf/templates/linux-gnu.mk \
+   -p libfms.a \
+   -c &quot;-Duse_libMPI -Duse_netCDF&quot; \
+   path_names</code></pre>
+<p>and build:</p>
+<pre><code>$ make NETCDF=3 REPRO=1 libfms.a -j</code></pre>
+</section>
+
+<section id="mkmf" class="title-slide slide level1">
+<h1><code>mkmf</code></h1>
+<dl>
+<dt><code>-t template</code></dt>
+<dd><p>Select a MKMF template file (<code>linux-gnu.mk</code>)</p>
+</dd>
+<dt><code>-p program</code></dt>
+<dd><p>Target program (<code>MOM6</code>) or library (<code>libfms.a</code>)</p>
+</dd>
+<dt><code>-c CPPDEFS</code></dt>
+<dd><p>Preprocessor defines (<code>-Duse_netCDF</code>)</p>
+</dd>
+</dl>
+</section>
+
+<section id="mom6-setup" class="title-slide slide level1">
+<h1>MOM6 Setup</h1>
+<pre class="sh"><code>$ cd ../..
+$ mkdir -p build/ocean_only
+$ cd build/ocean_only</code></pre>
+<p>Manifest:</p>
+<pre class="sh"><code>$ ../../src/mkmf/bin/list_paths \
+   -l ./ \
+      ../../src/MOM6/config_src/infra/FMS1/ \
+      ../../src/MOM6/config_src/memory/dynamic_symmetric/ \
+      ../../src/MOM6/config_src/drivers/solo_driver/ \
+      ../../src/MOM6/config_src/external/ \
+      ../../src/MOM6/src/*/ \
+      ../../src/MOM6/src/*/*/</code></pre>
+</section>
+
+<section id="mom6-paths" class="title-slide slide level1">
+<h1>MOM6 paths</h1>
+<dl>
+<dt><code>config_src/infra/FMS1</code></dt>
+<dd><p>Framework (I/O, parallelization, output format, etc.)</p>
+</dd>
+<dt><code>config_src/memory/dynamic_symmetric</code></dt>
+<dd><p>Memory layout (see "Internals" session)</p>
+</dd>
+<dt><code>config_src/drivers/solo_driver</code></dt>
+<dd><p>The "program": solo (ocean-only), coupled, etc.</p>
+</dd>
+<dt><code>config_src/external</code></dt>
+<dd><p>External packages (BGC, data assimilation, etc)</p>
+</dd>
+</dl>
+</section>
+
+<section id="build-mom6" class="title-slide slide level1">
+<h1>Build MOM6</h1>
+<p>Create Makefile:</p>
+<pre class="sh"><code>$ ../../src/mkmf/bin/mkmf \
+   -t ../../src/mkmf/templates/linux-gnu.mk \
+   -o &#39;-I../fms&#39; \
+   -p MOM6 \
+   -l &#39;-L../fms -lfms&#39; \
+   path_names</code></pre>
+<p>Make it:</p>
+<pre><code>$ make NETCDF=3 REPRO=1 MOM6 -j</code></pre>
+</section>
+
+<section id="mkmf-part-deux" class="title-slide slide level1">
+<h1>mkmf part deux</h1>
+<dl>
+<dt><code>-o</code></dt>
+<dd><p>"Other flags", added to compiler (<code>-I../../shared/repro</code>)</p>
+</dd>
+<dt><code>-l</code></dt>
+<dd><p>Linker flags (<code>-L../../shared/repro -lfms</code>)</p>
+</dd>
+</dl>
+</section>
+
+<section id="final-product" class="title-slide slide level1">
+<h1>Final Product</h1>
+<p>Test the executable:</p>
+<pre><code>$ ./MOM6</code></pre>
+<p>If you see some output like this:</p>
+<pre><code>FATAL: get_ascii_file_num_lines: File input.nml does not exist.
+
+
+FATAL: get_ascii_file_num_lines: File input.nml does not exist.</code></pre>
+<p>then you are ready</p>
+</section>
+    </div>
+  </div>
+
+  <script src="./reveal.js/dist/reveal.js"></script>
+  <script src="./reveal.js/plugin/math/math.js"></script>
+  <script src="./reveal.js/plugin/notes/notes.js"></script>
+  <script src="./reveal.js/plugin/highlight/highlight.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          //TeX: {
+          //  inlineMath: [['\\(','\\)']],
+          //  displayMath: [['\\[','\\]']],
+          //  balanceBraces: true,
+          //  processEscapes: false,
+          //  processRefs: true,
+          //  processEnvironments: true,
+          //  preview: 'TeX',
+          //  skipTags: ['script','noscript','style','textarea','pre','code'],
+          //  ignoreClass: 'tex2jax_ignore',
+          //  processClass: 'tex2jax_process'
+          //},
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: './reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: './reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: './reveal.js/plugin/notes/notes.js', async: true }
+        ],
+        plugins : [ RevealMath, RevealNotes, RevealHighlight],
+      });
+    </script>
+    </body>
+</html>
