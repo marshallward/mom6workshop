@@ -1,0 +1,180 @@
+=============================
+Contributing to MOM6 (basics)
+=============================
+
+:author: Marshall Ward
+:description: How to contribute to MOM6
+:date: 2022-10-17
+:url: https://marshallward.org/mom6workshop/contrib1.html
+:preface:
+   TODO
+
+
+The MOM6 Repository
+===================
+
+TODO: Snapshot of website
+
+https://github.com/NOAA-GFDL/MOM6.git
+
+MOM6-examples uses this repository.
+
+
+The MOM6 Community
+==================
+
+.. image:: img/consortium.png
+   :width: 70%
+
+(Temporary picture)
+
+
+New Feature
+===========
+
+Get the repository::
+
+   $ git clone https://github.com/NOAA-GFDL/MOM6.git --recursive
+
+This creates a **remote** to NOAA-GFDL named ``origin``.
+
+.. code::
+
+   $ git remote -v
+   origin	https://github.com/NOAA-GFDL/MOM6.git (fetch)
+   origin	https://github.com/NOAA-GFDL/MOM6.git (push)
+
+Exercise:
+   Go to https://github.com, fork MOM6, and create a new remote
+
+
+Solution
+--------
+
+1. Log into GitHub, go to MOM6:
+
+   https://github.com/NOAA-GFDL/MOM6.git
+
+2. Fork MOM6 to your account:
+
+   https://github.com/marshallward/MOM6.git
+
+3. Create a remote to your new GitHub repo::
+
+      $ git remote add marshall https://github.com/marshallward/MOM6.git
+
+4. Sync to the remote::
+
+      $ git push marshall dev/gfdl
+
+
+Branching
+=========
+
+You want to start a new project!  Create a new **branch**:
+
+.. code:: sh
+
+   $ git checkout dev/gfdl       # Switch to dev/gfdl
+   $ git pull                    # Sync with origin
+   $ git branch my_feature       # Create a new branch
+   $ git checkout my_feature     # Switch to new branch
+
+Changes to ``my_feature`` will not alter ``dev/gfdl``.
+
+
+Changing the Code
+=================
+
+Some superficial example
+
+
+Commiting Changes
+=================
+
+* git status
+* git add ...
+* git commit
+* commit formatting
+
+====
+
+Linus quote
+
+
+Preparing the Pull Request
+==========================
+
+GitHub handles **pull requests** (PRs) between repositories.
+
+The PR *moves* commits between repositories.
+
+.. code:: sh
+
+   $ git fetch origin dev/gfdl      # Update the target branch
+   $ git checkout my_feature        # switch to feature
+   $ git rebase -i dev/gfdl         # sync commits
+   $ git push marshall my_feature   # Push to personal repo
+
+
+Minor Edits
+===========
+
+Use **force pushes** for minor changes::
+
+   $ vim src/my_file.F90                     # Modify code
+   $ git add src/my_file.F90                 # Add to commit
+   $ git commit --amend                      # Change the commit
+   $ git push --force marshall my_feature    # Rewrite history
+
+Examples:
+
+* bugfixes
+* whitespace fixes
+* missing documentation
+
+No one cares about typos!  Don't put them in the history
+
+
+Submit to MOM6
+==============
+
+TODO
+
+
+Fast-Forward?
+-------------
+
+Explain FF
+
+
+CI Testing
+==========
+
+"Continuous Integration"
+
+Briefly describe test suite
+
+
+Gaea Regression
+===============
+
+"Extra" step
+
+
+Final Approval
+==============
+
+
+Epilogue: Merge to Main
+=======================
+
+Show the process
+
+
+Exercise
+========
+
+Add a diagnostic?  Doesn't really matter...
+
+Hold hands here, make it simple...

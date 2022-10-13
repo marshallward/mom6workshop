@@ -42,7 +42,8 @@
     </header>
 
     <footer style="font-size: 1pc; position: absolute; bottom: 2%; left: 2%;">
-      <code><p><a href="https://marshallward.org/mom6workshop/build.html">https://marshallward.org/mom6workshop/build.html</a></p></code>
+      <code><p><a
+href="https://marshallward.org/mom6workshop/build.html">https://marshallward.org/mom6workshop/build.html</a></p></code>
     </footer>
 
     <div class="slides">
@@ -125,10 +126,14 @@ $ git submodule update --init --recursive</code></pre>
 <h1>GFDL Tools</h1>
 <dl>
 <dt><code>list_paths</code></dt>
-<dd><p>Generates a list of files to be compiled (usually in <code>path_names</code>)</p>
+<dd>
+<p>Generates a list of files to be compiled (usually in
+<code>path_names</code>)</p>
 </dd>
 <dt><code>mkmf</code></dt>
-<dd><p>Generates a Makefile from <code>path_names</code> and a platform template (e.g. <code>linux-gnu.mk</code>)</p>
+<dd>
+<p>Generates a Makefile from <code>path_names</code> and a platform
+template (e.g. <code>linux-gnu.mk</code>)</p>
 </dd>
 </dl>
 </section>
@@ -152,13 +157,16 @@ $ ../../src/mkmf/bin/list_paths -l ../../src/FMS</code></pre>
 <h1><code>list_paths</code></h1>
 <dl>
 <dt><code>-l</code></dt>
-<dd><p>Follow symbolic links (needed for MOM6)</p>
+<dd>
+<p>Follow symbolic links (needed for MOM6)</p>
 </dd>
 <dt><code>&lt;paths&gt;</code></dt>
-<dd><p>Directories to search for source</p>
+<dd>
+<p>Directories to search for source</p>
 </dd>
 <dt><code>-o &lt;out_file&gt;</code></dt>
-<dd><p>Write report to file <code>&lt;out_file&gt;</code></p>
+<dd>
+<p>Write report to file <code>&lt;out_file&gt;</code></p>
 </dd>
 </dl>
 <p>Default is <code>path_names</code></p>
@@ -180,13 +188,17 @@ $ ../../src/mkmf/bin/list_paths -l ../../src/FMS</code></pre>
 <h1><code>mkmf</code></h1>
 <dl>
 <dt><code>-t template</code></dt>
-<dd><p>Select a MKMF template file (<code>linux-gnu.mk</code>)</p>
+<dd>
+<p>Select a MKMF template file (<code>linux-gnu.mk</code>)</p>
 </dd>
 <dt><code>-p program</code></dt>
-<dd><p>Target program (<code>MOM6</code>) or library (<code>libfms.a</code>)</p>
+<dd>
+<p>Target program (<code>MOM6</code>) or library
+(<code>libfms.a</code>)</p>
 </dd>
 <dt><code>-c CPPDEFS</code></dt>
-<dd><p>Preprocessor defines (<code>-Duse_netCDF</code>)</p>
+<dd>
+<p>Preprocessor defines (<code>-Duse_netCDF</code>)</p>
 </dd>
 </dl>
 </section>
@@ -501,16 +513,20 @@ $ cd build/ocean_only</code></pre>
 <h1>MOM6 paths</h1>
 <dl>
 <dt><code>config_src/infra/FMS1</code></dt>
-<dd><p>Framework (I/O, parallelization, output format, etc.)</p>
+<dd>
+<p>Framework (I/O, parallelization, output format, etc.)</p>
 </dd>
 <dt><code>config_src/memory/dynamic_symmetric</code></dt>
-<dd><p>Memory layout (see "Internals" session)</p>
+<dd>
+<p>Memory layout (see "Internals" session)</p>
 </dd>
 <dt><code>config_src/drivers/solo_driver</code></dt>
-<dd><p>The "program": solo (ocean-only), coupled, etc.</p>
+<dd>
+<p>The "program": solo (ocean-only), coupled, etc.</p>
 </dd>
 <dt><code>config_src/external</code></dt>
-<dd><p>External packages (BGC, data assimilation, etc)</p>
+<dd>
+<p>External packages (BGC, data assimilation, etc)</p>
 </dd>
 </dl>
 </section>
@@ -532,10 +548,13 @@ $ cd build/ocean_only</code></pre>
 <h1>mkmf part deux</h1>
 <dl>
 <dt><code>-o</code></dt>
-<dd><p>"Other flags", added to compiler (<code>-I../../shared/repro</code>)</p>
+<dd>
+<p>"Other flags", added to compiler
+(<code>-I../../shared/repro</code>)</p>
 </dd>
 <dt><code>-l</code></dt>
-<dd><p>Linker flags (<code>-L../../shared/repro -lfms</code>)</p>
+<dd>
+<p>Linker flags (<code>-L../../shared/repro -lfms</code>)</p>
 </dd>
 </dl>
 </section>
@@ -564,10 +583,41 @@ FATAL: get_ascii_file_num_lines: File input.nml does not exist.</code></pre>
       // Full list of configuration options available at:
       // https://github.com/hakimel/reveal.js#configuration
       Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+        // Display a presentation progress bar
+        progress: true,
         // Display the page number of the current slide
         slideNumber: true,
         // Push each slide change to the browser history
         history: true,
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+        // Enable the slide overview mode
+        overview: true,
+        // Vertical centering of slides
+        center: true,
+        // Enables touch navigation on devices with touch input
+        touch: true,
+        // Turns fragments on and off globally
+        fragments: true,
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+        // Transition style
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+        // Transition speed
+        transitionSpeed: 'default', // default/fast/slow
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'fade', // none/fade/slide/convex/concave/zoom
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
         math: {
           mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
           config: 'TeX-AMS_HTML-full',
