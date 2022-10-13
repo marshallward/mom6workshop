@@ -80,11 +80,11 @@ href="https://marshallward.org/mom6workshop/internals.html">https://marshallward
 </tr>
 <tr class="even">
 <td><code>config_src/</code></td>
-<td>Configurable components (solo vs coupled, BGC, etc)</td>
+<td>Configurable components</td>
 </tr>
 <tr class="odd">
 <td><code>pkg/</code></td>
-<td>External dependencies linked into <code>src/</code></td>
+<td>Dependencies linked into <code>src/</code></td>
 </tr>
 <tr class="even">
 <td><code>doc/</code></td>
@@ -121,6 +121,42 @@ href="https://marshallward.org/mom6workshop/internals.html">https://marshallward
 </dd>
 </dl></li>
 </ul>
+</section>
+
+<section id="src" class="title-slide slide level1">
+<h1><code>src/</code></h1>
+<table>
+<thead>
+<tr class="header">
+<th>Directory</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>core/</code></td>
+<td>Init, Timestep, main solvers</td>
+</tr>
+<tr class="even">
+<td><code>parameterizations/</code></td>
+<td>Viscosity, mixing, diabatic</td>
+</tr>
+<tr class="odd">
+<td><code>ALE/</code></td>
+<td>Vertical remapping</td>
+</tr>
+<tr class="even">
+<td><code>diagnostics/</code></td>
+<td>Diags</td>
+</tr>
+<tr class="odd">
+<td><code>user/</code></td>
+<td>Preset forcing, topography</td>
+</tr>
+</tbody>
+</table>
+<p>Also see <code>framework/</code>, <code>equation_of_state/</code>,
+etc</p>
 </section>
     </div>
   </div>

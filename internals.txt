@@ -42,3 +42,34 @@ Configuration Code
    * Data assimilation (ODA)
    * database interface
    * Python interface?
+
+
+``src/``
+========
+
+======================  ============================
+Directory               Description
+======================  ============================
+``core/``               Init, Timestep, main solvers
+``parameterizations/``  Viscosity, mixing, diabatic
+``ALE/``                Vertical remapping
+``diagnostics/``        Diags
+``user/``               Preset forcing, topography
+======================  ============================
+
+Also see ``framework/``, ``equation_of_state/``, etc
+
+
+TODO
+====
+
+Code layout:
+
+* One module per file ("python rule")
+
+* Modules are "independent" (no global/module data)
+   * Control structures manage cross-module data
+   * "big" functions, lots of arguments
+   * some might argue with this assertion!
+
+
