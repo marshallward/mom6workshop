@@ -162,6 +162,13 @@ and build::
    Preprocessor defines (``-Duse_netCDF``)
 
 
+MKMF Template
+=============
+
+.. include:: ref/linux-gnu.mk
+   :code:
+
+
 MOM6 Setup
 ==========
 
@@ -176,8 +183,7 @@ Manifest:
 .. code:: sh
 
    $ ../../src/mkmf/bin/list_paths \
-      -l ./ \
-         ../../src/MOM6/config_src/infra/FMS1/ \
+      -l ../../src/MOM6/config_src/infra/FMS1/ \
          ../../src/MOM6/config_src/memory/dynamic_symmetric/ \
          ../../src/MOM6/config_src/drivers/solo_driver/ \
          ../../src/MOM6/config_src/external/ \
