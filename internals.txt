@@ -1,0 +1,44 @@
+==============
+MOM6 Internals
+==============
+
+:author: Marshall Ward
+:description: Tour of MOM6 architecture
+:date: 2022-10-17
+:url: https://marshallward.org/mom6workshop/internals.html
+:preface:
+   TODO
+
+
+MOM6 directory tree
+===================
+
+=========         =================================
+Directory         Description
+=========         =================================
+``src/``          Model code, including solvers
+``config_src/``   Configurable components
+``pkg/``          Dependencies linked into ``src/``
+``doc/``          Documentation
+``ac/``           Autoconf build
+=========         =================================
+
+
+Model code
+==========
+
+
+Configuration Code
+==================
+
+* drivers
+
+* memory layout (symmetrics/nonsymmetric)
+
+* framework (infra/FMS1,FMS2)
+
+* externals
+   * biogeochemical model
+   * Data assimilation (ODA)
+   * database interface
+   * Python interface?

@@ -17,7 +17,7 @@ DOTFIGURES=$(patsubst %.dot,%.svg,$(subst dot/,img/,$(DOTFILES)))
 
 SOURCE=$(wildcard src/*.F90)
 
-all: index.html build.html contrib1.html contrib2.html internals.html reveal.js
+all: index.html build.html internals.html contrib1.html contrib2.html reveal.js
 
 reveal.js:
 	wget -N ${REPO}
