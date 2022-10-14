@@ -1,11 +1,11 @@
-=============================
-Contributing to MOM6 (basics)
-=============================
+====================
+Contributing to MOM6
+====================
 
 :author: Marshall Ward
 :description: How to contribute to MOM6
-:date: 2022-10-17
-:url: https://marshallward.org/mom6workshop/contrib1.html
+:date: 2022-10-18
+:url: https://marshallward.org/mom6workshop/contrib.html
 :preface:
    TODO
 

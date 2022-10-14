@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Marshall Ward">
-  <meta name="dcterms.date" content="2022-10-17">
+  <meta name="dcterms.date" content="2022-10-18">
   <title>MOM6 Internals</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -56,7 +56,7 @@
   </div-->
   <h1 class="title">MOM6 Internals</h1>
   <p class="author" style="text-align: right;">Marshall Ward</p>
-  <p class="date" style="text-align: right;">2022-10-17</p>
+  <p class="date" style="text-align: right;">2022-10-18</p>
   <!-- Currently cannot add notes to a title slide, so have to do manually-->
   <aside class="notes">
     <p>TODO</p>
@@ -95,30 +95,6 @@
 </tr>
 </tbody>
 </table>
-</section>
-
-<section id="model-code" class="title-slide slide level1">
-<h1>Model code</h1>
-
-</section>
-
-<section id="configuration-code" class="title-slide slide level1">
-<h1>Configuration Code</h1>
-<ul>
-<li>drivers</li>
-<li>memory layout (symmetrics/nonsymmetric)</li>
-<li>framework (infra/FMS1,FMS2)</li>
-<li><dl>
-<dt>externals</dt>
-<dd><ul>
-<li>biogeochemical model</li>
-<li>Data assimilation (ODA)</li>
-<li>database interface</li>
-<li>Python interface?</li>
-</ul>
-</dd>
-</dl></li>
-</ul>
 </section>
 
 <section id="src" class="title-slide slide level1">
@@ -215,17 +191,54 @@
 
 <section id="metrics" class="title-slide slide level1">
 <h1>Metrics</h1>
+<p><img data-src="img/Arakawa_C_grid.png" alt="image" /></p>
 <ul>
 <li>G, GV, etc</li>
 <li>IJ/ij syntax</li>
+<li>Fortran array indexing (arbitrary)</li>
 </ul>
 </section>
 
-<section id="symmetric-layout" class="title-slide slide level1">
-<h1>Symmetric Layout</h1>
+<section id="memory-layout" class="title-slide slide level1">
+<h1>Memory Layout</h1>
+<table>
+<tbody>
+<tr class="odd">
+<td><p>Symmetric:</p>
+<figure>
+<img data-src="img/Horizontal_NE_indexing_sym.png" />
+</figure></td>
+<td><p>Nonsymmetric:</p>
+<figure>
+<img data-src="img/Horizontal_NE_indexing_nonsym.png" />
+</figure></td>
+</tr>
+</tbody>
+</table>
+<p>Symmetric grids have additional west/south points (possibly duplicate)</p>
+</section>
+
+<section id="model-code" class="title-slide slide level1">
+<h1>Model code</h1>
+
+</section>
+
+<section id="configuration-code" class="title-slide slide level1">
+<h1>Configuration Code</h1>
 <ul>
-<li></li>
-<li>Syntax</li>
+<li>drivers</li>
+<li>memory layout (symmetrics/nonsymmetric)</li>
+<li>framework (infra/FMS1,FMS2)</li>
+<li><dl>
+<dt>externals</dt>
+<dd><ul>
+<li>biogeochemical model</li>
+<li>Data assimilation (ODA)</li>
+<li>database interface</li>
+<li>Python interface?</li>
+</ul>
+</dd>
+</dl></li>
 </ul>
 </section>
 
@@ -242,7 +255,9 @@
 <section id="checksums" class="title-slide slide level1">
 <h1>Checksums</h1>
 <ul>
-<li><code>[uvhB]chksum</code></li>
+<li><code>hchksum</code>: Cell centers</li>
+<li><code>uvchksum</code>: Cell faces</li>
+<li><code>Bchksum</code>: Cell vertices</li>
 </ul>
 </section>
 

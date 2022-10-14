@@ -17,7 +17,7 @@ DOTFIGURES=$(patsubst %.dot,%.svg,$(subst dot/,img/,$(DOTFILES)))
 
 SOURCE=$(wildcard src/*.F90)
 
-all: index.html build.html internals.html contrib1.html contrib2.html reveal.js
+all: index.html build.html internals.html contrib.html develop.html reveal.js
 
 reveal.js:
 	wget -N ${REPO}
@@ -32,8 +32,8 @@ index.html: index.txt
 	rst2html.py index.txt > index.html
 
 build.html: build.txt
-contrib1.html: contrib1.txt
-contrib2.html: contrib2.txt
+contrib.html: contrib.txt
+develop.html: develop.txt
 internals.html: internals.txt
 %.html : %.txt gfdl.revealjs reveal.js/css/theme/gfdl.css $(DOTFIGURES) $(SOURCE)
 	pandoc ${FLAGS} $< -o $@
@@ -50,7 +50,7 @@ img/fixedprec.svg: dot/fixedprec.dot
 clean:
 	rm -f index.html
 	rm -f build.html
-	rm -f contrib1.html
-	rm -f contrib1.html
+	rm -f contrib.html
+	rm -f develop.html
 	rm -f internals.html
 	rm -f $(DOTFIGURES)

@@ -4,7 +4,7 @@ MOM6 Internals
 
 :author: Marshall Ward
 :description: Tour of MOM6 architecture
-:date: 2022-10-17
+:date: 2022-10-18
 :url: https://marshallward.org/mom6workshop/internals.html
 :preface:
    TODO
@@ -22,26 +22,6 @@ Directory         Description
 ``doc/``          Documentation
 ``ac/``           Autoconf build
 ===============   =================================
-
-
-Model code
-==========
-
-
-Configuration Code
-==================
-
-* drivers
-
-* memory layout (symmetrics/nonsymmetric)
-
-* framework (infra/FMS1,FMS2)
-
-* externals
-   * biogeochemical model
-   * Data assimilation (ODA)
-   * database interface
-   * Python interface?
 
 
 ``src/``
@@ -107,17 +87,50 @@ Barotropic step                        ``btstep()``
 Metrics
 =======
 
+.. image:: img/Arakawa_C_grid.png
+
 * G, GV, etc
 
 * IJ/ij syntax
 
+* Fortran array indexing (arbitrary)
 
-Symmetric Layout
-================
 
-* 
+Memory Layout
+=============
 
-* Syntax
+.. list-table::
+
+   * - Symmetric:
+
+       .. figure:: img/Horizontal_NE_indexing_sym.png
+
+
+     - Nonsymmetric:
+
+       .. figure:: img/Horizontal_NE_indexing_nonsym.png
+
+Symmetric grids have additional west/south points (possibly duplicate)
+
+
+Model code
+==========
+
+
+Configuration Code
+==================
+
+* drivers
+
+* memory layout (symmetrics/nonsymmetric)
+
+* framework (infra/FMS1,FMS2)
+
+* externals
+   * biogeochemical model
+   * Data assimilation (ODA)
+   * database interface
+   * Python interface?
 
 
 Parallelization
@@ -131,7 +144,11 @@ Masking
 Checksums
 =========
 
-* ``[uvhB]chksum``
+* ``hchksum``: Cell centers
+
+* ``uvchksum``: Cell faces
+
+* ``Bchksum``: Cell vertices
 
 
 Diagnostics
