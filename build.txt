@@ -42,6 +42,21 @@ HPC systems use environment modules::
    module swap gcc gcc/9.3.0
    module load cray-netcdf
 
+.. Template file: ``ncrc-gnu.mk``
+
+
+Stellar
+-------
+
+Similar to Gaea::
+
+   module load gcc-toolset/10
+   openmpi/gcc/4.1.0
+   hdf5/gcc-toolset-10/1.10.6
+   netcdf/gcc/hdf5-1.10.6/4.7.4
+
+.. Template: ``linux-ubuntu-jammy-gnu.mk``
+
 
 Ubuntu/Debian
 -------------
@@ -149,6 +164,18 @@ and build::
    $ make NETCDF=3 REPRO=1 libfms.a -j
 
 
+Recommended Templates
+---------------------
+
+========    =========================
+Platform    Template
+========    =========================
+Gaea        ncrc-gnu.mk
+Stellar     linux-ubuntu-jammy-gnu.mk
+Ubuntu      linux-ubuntu-jammy-gnu.mk
+MacOS       osx-gcc10.mk
+========    =========================
+
 ``mkmf``
 ========
 
@@ -167,6 +194,8 @@ MKMF Template
 
 .. include:: ref/linux-gnu.mk
    :code:
+
+``NETCDF=3`` and ``REPRO=1`` are defined in templates
 
 
 MOM6 Setup

@@ -13,15 +13,15 @@ MOM6 Internals
 MOM6 directory tree
 ===================
 
-=========         =================================
+===============   =================================
 Directory         Description
-=========         =================================
+===============   =================================
 ``src/``          Model code, including solvers
 ``config_src/``   Configurable components
 ``pkg/``          Dependencies linked into ``src/``
 ``doc/``          Documentation
 ``ac/``           Autoconf build
-=========         =================================
+===============   =================================
 
 
 Model code
@@ -52,8 +52,9 @@ Directory               Description
 ======================  ============================
 ``core/``               Init, Timestep, main solvers
 ``parameterizations/``  Viscosity, mixing, diabatic
+``tracer/``             Tracer dynamics
 ``ALE/``                Vertical remapping
-``diagnostics/``        Diags
+``diagnostics/``        Diagonostic management
 ``user/``               Preset forcing, topography
 ======================  ============================
 
@@ -68,8 +69,79 @@ Code layout:
 * One module per file ("python rule")
 
 * Modules are "independent" (no global/module data)
+
    * Control structures manage cross-module data
    * "big" functions, lots of arguments
    * some might argue with this assertion!
+
+
+``step_MOM()``
+============
+
+* Field prep (ustar, psurf, etc)
+
+* Dynamics: ``step_MOM_dynamics()``
+
+* Thermodynamics: ``step_MOM_thermo()``
+
+* Tracers: ``step_MOM_tracer_dyn()``
+
+Ordering is somewhat configurable
+
+
+Dynamic core
+============
+
+``step_MOM_dyn_split_RK2()``
+
+===================================    ===================
+Forcing                                Subroutine
+===================================    ===================
+:math:`f \hat{z} \times \mathbf{u}`    ``CorAdCalc()``
+:math:`-\nabla p`                      ``PressureForce()``
+``diff[uv]`?                           (...)
+Barotropic step                        ``btstep()``
+===================================    ===================
+
+
+Metrics
+=======
+
+* G, GV, etc
+
+* IJ/ij syntax
+
+
+Symmetric Layout
+================
+
+* 
+
+* Syntax
+
+
+Parallelization
+===============
+
+
+Masking
+=======
+
+
+Checksums
+=========
+
+* ``[uvhB]chksum``
+
+
+Diagnostics
+===========
+
+* ``register_diag_field()``
+* ``post_data()``
+
+
+Timers
+======
 
 

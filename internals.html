@@ -42,8 +42,7 @@
     </header>
 
     <footer style="font-size: 1pc; position: absolute; bottom: 2%; left: 2%;">
-      <code><p><a
-href="https://marshallward.org/mom6workshop/internals.html">https://marshallward.org/mom6workshop/internals.html</a></p></code>
+      <code><p><a href="https://marshallward.org/mom6workshop/internals.html">https://marshallward.org/mom6workshop/internals.html</a></p></code>
     </footer>
 
     <div class="slides">
@@ -111,8 +110,7 @@ href="https://marshallward.org/mom6workshop/internals.html">https://marshallward
 <li>framework (infra/FMS1,FMS2)</li>
 <li><dl>
 <dt>externals</dt>
-<dd>
-<ul>
+<dd><ul>
 <li>biogeochemical model</li>
 <li>Data assimilation (ODA)</li>
 <li>database interface</li>
@@ -142,21 +140,123 @@ href="https://marshallward.org/mom6workshop/internals.html">https://marshallward
 <td>Viscosity, mixing, diabatic</td>
 </tr>
 <tr class="odd">
+<td><code>tracer/</code></td>
+<td>Tracer dynamics</td>
+</tr>
+<tr class="even">
 <td><code>ALE/</code></td>
 <td>Vertical remapping</td>
 </tr>
-<tr class="even">
-<td><code>diagnostics/</code></td>
-<td>Diags</td>
-</tr>
 <tr class="odd">
+<td><code>diagnostics/</code></td>
+<td>Diagonostic management</td>
+</tr>
+<tr class="even">
 <td><code>user/</code></td>
 <td>Preset forcing, topography</td>
 </tr>
 </tbody>
 </table>
-<p>Also see <code>framework/</code>, <code>equation_of_state/</code>,
-etc</p>
+<p>Also see <code>framework/</code>, <code>equation_of_state/</code>, etc</p>
+</section>
+
+<section id="todo" class="title-slide slide level1">
+<h1>TODO</h1>
+<p>Code layout:</p>
+<ul>
+<li><p>One module per file ("python rule")</p></li>
+<li><p>Modules are "independent" (no global/module data)</p>
+<ul>
+<li>Control structures manage cross-module data</li>
+<li>"big" functions, lots of arguments</li>
+<li>some might argue with this assertion!</li>
+</ul></li>
+</ul>
+<p><code>step_MOM()</code> ============</p>
+<ul>
+<li>Field prep (ustar, psurf, etc)</li>
+<li>Dynamics: <code>step_MOM_dynamics()</code></li>
+<li>Thermodynamics: <code>step_MOM_thermo()</code></li>
+<li>Tracers: <code>step_MOM_tracer_dyn()</code></li>
+</ul>
+<p>Ordering is somewhat configurable</p>
+</section>
+
+<section id="dynamic-core" class="title-slide slide level1">
+<h1>Dynamic core</h1>
+<p><code>step_MOM_dyn_split_RK2()</code></p>
+<table>
+<thead>
+<tr class="header">
+<th>Forcing</th>
+<th>Subroutine</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(f \hat{z} \times \mathbf{u}\)</span></td>
+<td><code>CorAdCalc()</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(-\nabla p\)</span></td>
+<td><code>PressureForce()</code></td>
+</tr>
+<tr class="odd">
+<td><span class="title-ref">`diff[uv]</span>?</td>
+<td>(...)</td>
+</tr>
+<tr class="even">
+<td>Barotropic step</td>
+<td><code>btstep()</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section id="metrics" class="title-slide slide level1">
+<h1>Metrics</h1>
+<ul>
+<li>G, GV, etc</li>
+<li>IJ/ij syntax</li>
+</ul>
+</section>
+
+<section id="symmetric-layout" class="title-slide slide level1">
+<h1>Symmetric Layout</h1>
+<ul>
+<li></li>
+<li>Syntax</li>
+</ul>
+</section>
+
+<section id="parallelization" class="title-slide slide level1">
+<h1>Parallelization</h1>
+
+</section>
+
+<section id="masking" class="title-slide slide level1">
+<h1>Masking</h1>
+
+</section>
+
+<section id="checksums" class="title-slide slide level1">
+<h1>Checksums</h1>
+<ul>
+<li><code>[uvhB]chksum</code></li>
+</ul>
+</section>
+
+<section id="diagnostics" class="title-slide slide level1">
+<h1>Diagnostics</h1>
+<ul>
+<li><code>register_diag_field()</code></li>
+<li><code>post_data()</code></li>
+</ul>
+</section>
+
+<section id="timers" class="title-slide slide level1">
+<h1>Timers</h1>
+
 </section>
     </div>
   </div>
@@ -171,41 +271,10 @@ etc</p>
       // Full list of configuration options available at:
       // https://github.com/hakimel/reveal.js#configuration
       Reveal.initialize({
-        // Display controls in the bottom right corner
-        controls: true,
-        // Display a presentation progress bar
-        progress: true,
         // Display the page number of the current slide
         slideNumber: true,
         // Push each slide change to the browser history
         history: true,
-        // Enable keyboard shortcuts for navigation
-        keyboard: true,
-        // Enable the slide overview mode
-        overview: true,
-        // Vertical centering of slides
-        center: true,
-        // Enables touch navigation on devices with touch input
-        touch: true,
-        // Turns fragments on and off globally
-        fragments: true,
-        // Flags if we should show a help overlay when the questionmark
-        // key is pressed
-        help: true,
-        // Number of milliseconds between automatically proceeding to the
-        // next slide, disabled when set to 0, this value can be overwritten
-        // by using a data-autoslide attribute on your slides
-        autoSlide: 0,
-        // Stop auto-sliding after user input
-        autoSlideStoppable: true,
-        // Transition style
-        transition: 'slide', // none/fade/slide/convex/concave/zoom
-        // Transition speed
-        transitionSpeed: 'default', // default/fast/slow
-        // Transition style for full page slide backgrounds
-        backgroundTransition: 'fade', // none/fade/slide/convex/concave/zoom
-        // Number of slides away from the current that are visible
-        viewDistance: 3,
         math: {
           mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
           config: 'TeX-AMS_HTML-full',
