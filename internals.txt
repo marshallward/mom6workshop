@@ -41,22 +41,25 @@ Directory               Description
 Also see ``framework/``, ``equation_of_state/``, etc
 
 
-TODO
-====
+Module Format
+=============
 
-Code layout:
+.. include:: doc/MOM_geothermal.F90
+   :code: fortran
 
-* One module per file ("python rule")
+* One module per file
+* Module communication by **control structures**
+* No internal module variables (i.e. no "state")
+* Self-documentation
 
-* Modules are "independent" (no global/module data)
+.. notes::
 
-   * Control structures manage cross-module data
-   * "big" functions, lots of arguments
-   * some might argue with this assertion!
+   One consequence of having no state is functions with very large numbers
+   of arguments.  An object-oriented approach could help reduce this.
 
 
 ``step_MOM()``
-============
+==============
 
 * Field prep (ustar, psurf, etc)
 
@@ -69,25 +72,39 @@ Code layout:
 Ordering is somewhat configurable
 
 
+Inside ``step_MOM()``
+---------------------
+
+.. include:: doc/MOM.F90
+   :code:
+
+.. TODO links to lines of code
+
+
 Dynamic core
 ============
 
 ``step_MOM_dyn_split_RK2()``
 
-===================================    ===================
+===================================    ====================
 Forcing                                Subroutine
-===================================    ===================
+===================================    ====================
 :math:`f \hat{z} \times \mathbf{u}`    ``CorAdCalc()``
 :math:`-\nabla p`                      ``PressureForce()``
-``diff[uv]`?                           (...)
+``diff[uv]``?                          (...)
+Continuity                             ``vertvisc_coef()``,
+                                       ``continuity()``
 Barotropic step                        ``btstep()``
-===================================    ===================
+===================================    ====================
 
-
+Repeat in a predictor/corrector solver
 Metrics
 =======
 
 .. image:: img/Arakawa_C_grid.png
+
+:math:`(i,j)` corresponds to
+
 
 * G, GV, etc
 

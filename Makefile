@@ -38,7 +38,6 @@ internals.html: internals.txt
 %.html : %.txt gfdl.revealjs reveal.js/css/theme/gfdl.css $(DOTFIGURES) $(SOURCE)
 	pandoc ${FLAGS} $< -o $@
 	sed -i 's/^" data-start-line=/"><code data-start-line=/g' $@
-	sed -i 's/^"><code>/">/g' $@
 	sed -i 's/<li class="fragment"/<li/g' $@
 
 img/%.svg: dot/%.dot

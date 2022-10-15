@@ -192,7 +192,7 @@ MacOS       osx-gcc10.mk
 MKMF Template
 =============
 
-.. include:: ref/linux-gnu.mk
+.. include:: doc/linux-gnu.mk
    :code:
 
 ``NETCDF=3`` and ``REPRO=1`` are defined in templates
