@@ -24,6 +24,22 @@ Directory         Description
 ===============   =================================
 
 
+Configuration Code
+==================
+
+* drivers
+
+* memory layout (symmetrics/nonsymmetric)
+
+* framework (infra/FMS1,FMS2)
+
+* externals
+   * biogeochemical model
+   * Data assimilation (ODA)
+   * database interface
+   * Python interface?
+
+
 ``src/``
 ========
 
@@ -50,67 +66,125 @@ Module Format
 * One module per file
 * Module communication by **control structures**
 * No internal module variables (i.e. no "state")
-* Self-documentation
 
 .. notes::
 
-   One consequence of having no state is functions with very large numbers
-   of arguments.  An object-oriented approach could help reduce this.
+   One consequence of having no state is that functions have many, many
+   arguments.  An object-oriented approach could help reduce this.
 
+
+Main Loop
+=========
 
 ``step_MOM()``
-==============
 
-* Field prep (ustar, psurf, etc)
-
-* Dynamics: ``step_MOM_dynamics()``
-
-* Thermodynamics: ``step_MOM_thermo()``
-
-* Tracers: ``step_MOM_tracer_dyn()``
+==============    ============================
+Process           Subroutine
+==============    ============================
+Dynamics          ``step_MOM_dynamics()``
+Thermodynamics    ``step_MOM_thermo()``
+Tracers           ``step_MOM_tracer_dyn()``
+==============    ============================
 
 Ordering is somewhat configurable
 
 
-Inside ``step_MOM()``
----------------------
+"Outer" Dynamic core
+====================
 
-.. include:: doc/MOM.F90
-   :code:
+``step_MOM_dynamics()``
 
-.. TODO links to lines of code
+========================   ============================
+Process                    Subroutine
+========================   ============================
+Thickness Diffusion        ``thickness_diffuse()``
+Bottom drag                ``set_viscous_BBL()``
+Flow transport             ``step_MOM_dyn_split_RK2()``
+ML restratification        ``mixedlayer_restrat()``
+Mesoscale eddy param.      ``step_forward_MEKE()``
+========================   ============================
+
+.. notes::
+
+   Most ocean-specific parameterizations appear here
 
 
-Dynamic core
-============
+"Inner" Dynamic Core
+====================
 
 ``step_MOM_dyn_split_RK2()``
 
-===================================    ====================
-Forcing                                Subroutine
-===================================    ====================
+===================================    ==========================
+Process                                Subroutine
+===================================    ==========================
 :math:`f \hat{z} \times \mathbf{u}`    ``CorAdCalc()``
 :math:`-\nabla p`                      ``PressureForce()``
-``diff[uv]``?                          (...)
-Continuity                             ``vertvisc_coef()``,
-                                       ``continuity()``
-Barotropic step                        ``btstep()``
-===================================    ====================
+Vertical Viscosity                     ``vertvisc()``
+Barotropic steps                       ``btstep()``
+Mass/Volume Balance                    ``continuity()``
+Horizontal viscosity                   ``horizontal_viscosity()``
+===================================    ==========================
 
-Repeat in a predictor/corrector solver
+.. notes::
+
+   Note that this repeats in a predictor/corrector-like algorithm.
+
+
+Thermodynamics
+==============
+
+========================   ============================
+Process                    Subroutine
+========================   ============================
+diabatic                   ???
+adiabatic                  ???
+ALE_main                   ???
+diag_update_remap_grids    ???
+========================   ============================
+
+
+Tracers
+=======
+
+* advect_tracer
+* tracer_hordiff
+* update_segment_tracer_reservoirs
+* step_forward_meke
+
+
 Metrics
 =======
 
 .. image:: img/Arakawa_C_grid.png
 
-:math:`(i,j)` corresponds to
+:math:`(i,j)` follows the "northeast convention"
 
 
-* G, GV, etc
+Index Macros
+============
 
-* IJ/ij syntax
+Static memory is supported with macros
 
-* Fortran array indexing (arbitrary)
+``#include <MOM_memory.h>``
+
+==========  ==================================
+Field       Declaration
+==========  ==================================
+Center      ``h(SZI_(G), SZJ_(G), SZK_(G))``
+East Face   ``u(SZIB_(G), SZJ_(G), SZK_(G))``
+North Face  ``v(SZI_(G), SZJB_(G), SZK_(G))``
+Vertex      ``q(SZIB_(G), SZJB_(G), SZK_(G))``
+==========  ==================================
+
+Use ``ALLOCABLE_()`` to allocate (if static)
+
+
+.. Indexing
+   ========
+
+.. TODO * G, GV, etc
+
+        * IJ/ij syntax
 
 
 Memory Layout
@@ -127,39 +201,72 @@ Memory Layout
 
        .. figure:: img/Horizontal_NE_indexing_nonsym.png
 
-Symmetric grids have additional west/south points (possibly duplicate)
+Symmetric grids have additional west/south points
 
+.. notes::
 
-Model code
-==========
-
-
-Configuration Code
-==================
-
-* drivers
-
-* memory layout (symmetrics/nonsymmetric)
-
-* framework (infra/FMS1,FMS2)
-
-* externals
-   * biogeochemical model
-   * Data assimilation (ODA)
-   * database interface
-   * Python interface?
+   If periodic, they match the east/north points
 
 
 Parallelization
 ===============
 
+.. image:: img/halo.svg
+
+MOM is single-pass: 4 sides and 4 corners concurrently
+
+(Other models are two-pass: N/S then E/W)
+
+
+Stencil Domains
+===============
+
+.. list-table::
+
+   * - .. image:: img/Horizontal_NE_indexing_sym.png
+
+     - Compute Domain
+         Physical values
+
+       Data Domain
+         Include halos
+
+       Global Domain
+         Global indexing
+
+
+Message Passing
+===============
+
+* ``group_pass`` etc
+
 
 Masking
 =======
 
+TODO
+
+
+Input Parameters
+================
+
+Define ``MOM_input`` parameters with ``get_param()``:
+
+.. code:: fortran
+
+   call get_param(param_file, mdl, "KH", Kh, &
+                  "The background Laplacian horizontal viscosity", &
+                  units="m2 s-1", &
+                  default=0.0, &
+                  scale=(US%m_to_L**2)*US%T_to_s, &
+                  do_not_log=.not.CS%Laplacian &
+   )
+
 
 Checksums
 =========
+
+Verify the reproducibility of fields:
 
 * ``hchksum``: Cell centers
 
