@@ -211,13 +211,13 @@ Manifest:
 
 .. code:: sh
 
-   $ ../../src/mkmf/bin/list_paths \
-      -l ../../src/MOM6/config_src/infra/FMS1/ \
-         ../../src/MOM6/config_src/memory/dynamic_symmetric/ \
-         ../../src/MOM6/config_src/drivers/solo_driver/ \
-         ../../src/MOM6/config_src/external/ \
-         ../../src/MOM6/src/*/ \
-         ../../src/MOM6/src/*/*/
+   $ ../../src/mkmf/bin/list_paths -l \
+       ../../src/MOM6/config_src/infra/FMS1/ \
+       ../../src/MOM6/config_src/memory/dynamic_symmetric/ \
+       ../../src/MOM6/config_src/drivers/solo_driver/ \
+       ../../src/MOM6/config_src/external/ \
+       ../../src/MOM6/src/*/ \
+       ../../src/MOM6/src/*/*/
 
 
 MOM6 paths
@@ -270,7 +270,8 @@ Final Product
 
 Test the executable::
 
-   $ ./MOM6
+   $ cd ../../ocean_only/double_gyre
+   $ ../../build/ocean_only/MOM6
 
 If you see some output like this::
 
@@ -279,4 +280,22 @@ If you see some output like this::
    
    FATAL: get_ascii_file_num_lines: File input.nml does not exist.
 
-then you are ready
+then you are ready.
+
+
+Exercises 
+=========
+
+1. Build the ice-ocean model using mkmf:
+
+   https://github.com/NOAA-GFDL/MOM6-examples/wiki/Getting-started#compiling-mom6-in-mom6-sis2-coupled-mode
+
+2. Attempt the MOM6 autoconf build and run the test suite:
+
+   https://github.com/NOAA-GFDL/MOM6/tree/dev/gfdl/ac
+
+   To run the test suite::
+
+      $ cd src/MOM6/.testing
+      $ make -j
+      $ make -j test
