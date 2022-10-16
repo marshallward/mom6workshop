@@ -63,31 +63,35 @@
   </aside>
 </section>
 
+<section class="slide level2">
+
+<p>Presentation is available at</p>
+<p><a href="https://marshallward.org/mom6workshop/contrib.html">https://marshallward.org/mom6workshop/contrib.html</a></p>
+</section>
 <section id="the-mom6-repository" class="title-slide slide level1">
 <h1>The MOM6 Repository</h1>
 <p>TODO: Snapshot of website</p>
 <p><a href="https://github.com/NOAA-GFDL/MOM6.git">https://github.com/NOAA-GFDL/MOM6.git</a></p>
-<p>MOM6-examples uses this repository.</p>
+<p>MOM6-examples pulls from this repository.</p>
 </section>
 
 <section id="the-mom6-community" class="title-slide slide level1">
 <h1>The MOM6 Community</h1>
-<p><img data-src="img/consortium.png" style="width:70.0%" alt="image" /></p>
-<p>(Temporary picture)</p>
+<p><img data-src="img/consortium.svg" style="width:80.0%" alt="image" /></p>
 </section>
 
 <section>
-<section id="new-feature" class="title-slide slide level1">
-<h1>New Feature</h1>
+<section id="cloning" class="title-slide slide level1">
+<h1>Cloning</h1>
 <p>Get the repository:</p>
 <pre><code>$ git clone https://github.com/NOAA-GFDL/MOM6.git --recursive</code></pre>
-<p>This creates a <strong>remote</strong> to NOAA-GFDL named <code>origin</code>.</p>
+<p>This creates a <em>remote</em> to NOAA-GFDL named <code>origin</code>.</p>
 <pre class=""><code>$ git remote -v
 origin   https://github.com/NOAA-GFDL/MOM6.git (fetch)
 origin   https://github.com/NOAA-GFDL/MOM6.git (push)</code></pre>
 <dl>
 <dt>Exercise:</dt>
-<dd><p>Go to <a href="https://github.com">https://github.com</a>, fork MOM6, and create a new remote</p>
+<dd><p>Go to GitHub, fork MOM6, and create a new remote</p>
 </dd>
 </dl>
 </section>
@@ -106,7 +110,7 @@ origin   https://github.com/NOAA-GFDL/MOM6.git (push)</code></pre>
 </section></section>
 <section id="branching" class="title-slide slide level1">
 <h1>Branching</h1>
-<p>You want to start a new project! Create a new <strong>branch</strong>:</p>
+<p>You want to start a new project! Create a new <em>branch</em>:</p>
 <pre class="sh"><code>$ git checkout dev/gfdl       # Switch to dev/gfdl
 $ git pull                    # Sync with origin
 $ git branch my_feature       # Create a new branch
@@ -145,8 +149,8 @@ $ git push marshall my_feature   # Push to personal repo</code></pre>
 
 <section id="minor-edits" class="title-slide slide level1">
 <h1>Minor Edits</h1>
-<p>Use <strong>force pushes</strong> for minor changes:</p>
-<pre><code>$ vim src/my_file.F90                     # Modify code
+<p>Use <em>amends</em> and <em>force pushes</em> for minor changes:</p>
+<pre class="sh"><code>$ vim src/my_file.F90                     # Modify code
 $ git add src/my_file.F90                 # Add to commit
 $ git commit --amend                      # Change the commit
 $ git push --force marshall my_feature    # Rewrite history</code></pre>

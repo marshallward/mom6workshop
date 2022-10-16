@@ -9,6 +9,12 @@ Contributing to MOM6
 :preface:
    TODO
 
+----
+
+Presentation is available at
+
+https://marshallward.org/mom6workshop/contrib.html
+
 
 The MOM6 Repository
 ===================
@@ -17,26 +23,24 @@ TODO: Snapshot of website
 
 https://github.com/NOAA-GFDL/MOM6.git
 
-MOM6-examples uses this repository.
+MOM6-examples pulls from this repository.
 
 
 The MOM6 Community
 ==================
 
-.. image:: img/consortium.png
-   :width: 70%
-
-(Temporary picture)
+.. image:: img/consortium.svg
+   :width: 80%
 
 
-New Feature
-===========
+Cloning
+=======
 
 Get the repository::
 
    $ git clone https://github.com/NOAA-GFDL/MOM6.git --recursive
 
-This creates a **remote** to NOAA-GFDL named ``origin``.
+This creates a *remote* to NOAA-GFDL named ``origin``.
 
 .. code::
 
@@ -45,7 +49,7 @@ This creates a **remote** to NOAA-GFDL named ``origin``.
    origin	https://github.com/NOAA-GFDL/MOM6.git (push)
 
 Exercise:
-   Go to https://github.com, fork MOM6, and create a new remote
+   Go to GitHub, fork MOM6, and create a new remote
 
 
 Solution
@@ -71,7 +75,7 @@ Solution
 Branching
 =========
 
-You want to start a new project!  Create a new **branch**:
+You want to start a new project!  Create a new *branch*:
 
 .. code:: sh
 
@@ -120,7 +124,9 @@ The PR *moves* commits between repositories.
 Minor Edits
 ===========
 
-Use **force pushes** for minor changes::
+Use *amends* and *force pushes* for minor changes:
+
+.. code:: sh
 
    $ vim src/my_file.F90                     # Modify code
    $ git add src/my_file.F90                 # Add to commit
