@@ -63,6 +63,12 @@
   </aside>
 </section>
 
+<section class="slide level2">
+
+<p>Presentation is available at</p>
+<p><a href="https://marshallward.org/mom6workshop/internals.html">https://marshallward.org/mom6workshop/internals.html</a></p>
+<p>Goal: Begin reading and navigating the codebase</p>
+</section>
 <section id="mom6-directory-tree" class="title-slide slide level1">
 <h1>MOM6 directory tree</h1>
 <table>
@@ -129,7 +135,7 @@
 </tr>
 </tbody>
 </table>
-<p>New coupled models would be expected to develop their own drivers.</p>
+<p>New models probably need to develop their own drivers.</p>
 </section>
 
 <section id="other-configs" class="title-slide slide level1">
@@ -145,7 +151,7 @@
 <dd><p>BGC, Data assimilation, Python interface, etc.</p>
 </dd>
 </dl>
-<p>Complex projects can add their own implementations</p>
+<p>Ideal for interfacing with other technology</p>
 </section>
 
 <section id="src" class="title-slide slide level1">
@@ -823,7 +829,7 @@ end module MOM_geothermal
 </thead>
 <tbody>
 <tr class="odd">
-<td>Fluid Transport</td>
+<td>Dynamic Core</td>
 <td><code>step_MOM_dynamics()</code></td>
 </tr>
 <tr class="even">
@@ -924,13 +930,13 @@ end module MOM_geothermal
 <p><code>src/paramerizations/vertical/MOM_diabatic_driver.F90</code></p>
 <p>Many parameterizations are applied via <code>diabatic()</code></p>
 <ul>
-<li>Geothermal heating</li>
 <li>KPP (vertical) mixing</li>
 <li>Bulk mixed layer</li>
 <li>Convective mixing (CVMix)</li>
+<li>Geothermal heating</li>
 <li>Shortwave radiative heating</li>
 </ul>
-<p>If <code>adiabatic()</code>, comparatively little happens here</p>
+<p>If <code>adiabatic()</code>, comparatively less happens here</p>
 <aside class="notes">
 <p>There are two diabatic functions: diabatic_ALE() and layered_diabatic() (actually two ALE functions! But nevermind that)</p>
 </aside>
@@ -950,6 +956,69 @@ end module MOM_geothermal
 <h1>Metric Grids</h1>
 <p><img data-src="img/Arakawa_C_grid.png" alt="image" /></p>
 <p><span class="math inline">\((i,j)\)</span> follows the "northeast convention"</p>
+</section>
+
+<section id="stencil-domains" class="title-slide slide level1">
+<h1>Stencil Domains</h1>
+<table>
+<tbody>
+<tr class="odd">
+<td><img data-src="img/Horizontal_NE_indexing_sym.png" alt="image" /></td>
+<td><dl>
+<dt>Compute Domain</dt>
+<dd><p>Physical values</p>
+</dd>
+<dt>Data Domain</dt>
+<dd><p>Include halos</p>
+</dd>
+<dt>Global Domain</dt>
+<dd><p>Global indexing</p>
+</dd>
+</dl></td>
+</tr>
+</tbody>
+</table>
+<p>Stencils like <span class="math inline">\(u^{n+1}_i = u^n_i + \nu \left(u^n_{i-1} - 2 u^n_i + u^n_{i+1}\right)\)</span> need values beyond the compute domain.</p>
+</section>
+
+<section id="index-bounds" class="title-slide slide level1">
+<h1>Index Bounds</h1>
+<p>Bounds stored in <code>ocean_grid_type</code>, <code>G</code></p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><table>
+<tbody>
+<tr class="odd">
+<td><code>G%isc:G%iec</code></td>
+</tr>
+<tr class="even">
+<td><code>G%iscB:G%iecB</code></td>
+</tr>
+<tr class="odd">
+<td><code>G%isd:G%ied</code></td>
+</tr>
+<tr class="even">
+<td><code>G%isg:G%ieg</code></td>
+</tr>
+<tr class="odd">
+<td>...</td>
+</tr>
+</tbody>
+</table></td>
+<td><pre class=""><code>do j = G%jsc, G%jec
+  do i = G%isc, G%iec
+    h(i,j) = ...
+  enddo
+enddo</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>Bounds may extend into halos (e.g. derivatives)</p>
 </section>
 
 <section id="memory-layout" class="title-slide slide level1">
@@ -1017,39 +1086,6 @@ end module MOM_geothermal
 <p>(Other models are two-pass: N/S then E/W)</p>
 </section>
 
-<section id="stencil-domains" class="title-slide slide level1">
-<h1>Stencil Domains</h1>
-<table>
-<tbody>
-<tr class="odd">
-<td><img data-src="img/Horizontal_NE_indexing_sym.png" alt="image" /></td>
-<td><dl>
-<dt>Compute Domain</dt>
-<dd><p>Physical values</p>
-</dd>
-<dt>Data Domain</dt>
-<dd><p>Include halos</p>
-</dd>
-<dt>Global Domain</dt>
-<dd><p>Global indexing</p>
-</dd>
-</dl></td>
-</tr>
-</tbody>
-</table>
-</section>
-
-<section id="index-bounds" class="title-slide slide level1">
-<h1>Index Bounds</h1>
-<p>Bounds stored in <code>ocean_grid_type</code>, <code>G</code></p>
-<pre class=""><code>do j = G%jsc, G%jec
-  do i = G%isc, G%iec
-    h(i,j) = ...
-  enddo
-enddo</code></pre>
-<p>Bounds may extend into halos (e.g. derivatives)</p>
-</section>
-
 <section id="message-passing" class="title-slide slide level1">
 <h1>Message Passing</h1>
 <dl>
@@ -1115,44 +1151,45 @@ endif</code></pre>
 <section id="checksums" class="title-slide slide level1">
 <h1>Checksums</h1>
 <p>Verify the reproducibility of fields:</p>
-<table>
-<thead>
-<tr class="header">
-<th>Field position</th>
-<th>Checksum</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Center</td>
-<td><code>hchksum</code></td>
-</tr>
-<tr class="even">
-<td>Face</td>
-<td><code>uvchksum</code></td>
-</tr>
-<tr class="odd">
-<td>Vertex</td>
-<td><code>Bchksum</code></td>
-</tr>
-</tbody>
-</table>
-<pre class="fortran"><code>call hchksum(Kh_h, &quot;Kh_h&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)
-
+<pre class="fortran"><code>! Cell center
+call hchksum(Kh_h, &quot;Kh_h&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)
+! Cell faces
 call uvchksum(&quot;Kh_[uv]&quot;, Kh_u, Kh_v, G%HI, &amp;
               scale=(US%L_to_m**2)*US%s_to_T, scalar_pair=.true.)
-
+! Cell vertex
 call Bchksum(Kh_q, &quot;Kh_q&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)</code></pre>
+<p>See "MOM6 development" for more info</p>
 </section>
 
 <section id="timers" class="title-slide slide level1">
 <h1>Timers</h1>
+<pre class="fortran"><code>! Initialize timer
+id_clock_ocean = cpu_clock_id(&#39;Ocean&#39;, grain=CLOCK_COMPONENT)
 
+! Main loop
+
+! Start timer
+call cpu_clock_begin(id_clock_ocean)
+
+! ... do some task
+
+! End timer
+call cpu_clock_end(id_clock_ocean)</code></pre>
+<p>Results printed to stdout at end of run</p>
 </section>
 
-<section id="summary" class="title-slide slide level1">
-<h1>Summary</h1>
-<p>???</p>
+<section id="other-topics" class="title-slide slide level1">
+<h1>Other Topics</h1>
+<ul>
+<li><p>Restart field management (<code>register_restart_field()</code>)</p></li>
+<li><p>Vertical regridding (<code>MOM_ALE.F90</code>)</p></li>
+<li><p>Interacting with coupler</p>
+<ul>
+<li><code>forces</code>, <code>fluxes</code>, etc</li>
+<li>Time interpolation</li>
+</ul></li>
+<li><p><code>data_override()</code></p></li>
+</ul>
 </section>
     </div>
   </div>

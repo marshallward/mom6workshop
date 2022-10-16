@@ -11,7 +11,7 @@ Building MOM6
 
 ----
 
-Presentation slides are available at
+Presentation is available at
 
 https://marshallward.org/mom6workshop/build.html
 

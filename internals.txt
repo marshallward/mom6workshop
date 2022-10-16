@@ -9,6 +9,14 @@ MOM6 Internals
 :preface:
    TODO
 
+----
+
+Presentation is available at
+
+https://marshallward.org/mom6workshop/internals.html
+
+Goal: Begin reading and navigating the codebase
+
 
 MOM6 directory tree
 ===================
@@ -37,7 +45,7 @@ Directory               Driver
 ``mct_cap``             MCT coupler
 ===================     =========================
 
-New coupled models would be expected to develop their own drivers.
+New models probably need to develop their own drivers.
 
 
 Other configs
@@ -52,7 +60,7 @@ Other configs
 ``config_src/external``
    BGC, Data assimilation, Python interface, etc.
 
-Complex projects can add their own implementations
+Ideal for interfacing with other technology
 
 .. TODO example?  cheng's builds?
 
@@ -95,13 +103,13 @@ Main Loop
 
 ``step_MOM()``
 
-==============    ============================
+================  =========================
 Process           Subroutine
-================  ============================
-Fluid Transport   ``step_MOM_dynamics()``
+================  =========================
+Dynamic Core      ``step_MOM_dynamics()``
 Diabatic forcing  ``step_MOM_thermo()``
 Tracers           ``step_MOM_tracer_dyn()``
-================  ============================
+================  =========================
 
 Ordering is somewhat configurable
 
@@ -154,13 +162,13 @@ Diabatic Forcing
 
 Many parameterizations are applied via ``diabatic()``
 
-* Geothermal heating
 * KPP (vertical) mixing
 * Bulk mixed layer
 * Convective mixing (CVMix)
+* Geothermal heating
 * Shortwave radiative heating
 
-If ``adiabatic()``, comparatively little happens here
+If ``adiabatic()``, comparatively less happens here
 
 .. notes::
 
@@ -183,6 +191,54 @@ Metric Grids
 .. image:: img/Arakawa_C_grid.png
 
 :math:`(i,j)` follows the "northeast convention"
+
+
+Stencil Domains
+===============
+
+.. list-table::
+
+   * - .. image:: img/Horizontal_NE_indexing_sym.png
+
+     - Compute Domain
+         Physical values
+
+       Data Domain
+         Include halos
+
+       Global Domain
+         Global indexing
+
+Stencils like
+:math:`u^{n+1}_i = u^n_i + \nu \left(u^n_{i-1} - 2 u^n_i + u^n_{i+1}\right)`
+need values beyond the compute domain.
+
+
+Index Bounds
+============
+
+Bounds stored in ``ocean_grid_type``, ``G``
+
+.. list-table::
+   :widths: 50 50 
+
+   * - =================
+       ``G%isc:G%iec``
+       ``G%iscB:G%iecB``
+       ``G%isd:G%ied``
+       ``G%isg:G%ieg``
+       ...
+       =================  
+
+     - .. code::
+
+          do j = G%jsc, G%jec
+            do i = G%isc, G%iec
+              h(i,j) = ...
+            enddo
+          enddo
+
+Bounds may extend into halos (e.g. derivatives)
 
 
 Memory Layout
@@ -235,39 +291,6 @@ Parallelization
 MOM is single-pass: 4 sides and 4 corners concurrently
 
 (Other models are two-pass: N/S then E/W)
-
-
-Stencil Domains
-===============
-
-.. list-table::
-
-   * - .. image:: img/Horizontal_NE_indexing_sym.png
-
-     - Compute Domain
-         Physical values
-
-       Data Domain
-         Include halos
-
-       Global Domain
-         Global indexing
-
-
-Index Bounds
-============
-
-Bounds stored in ``ocean_grid_type``, ``G``
-
-.. code::
-
-   do j = G%jsc, G%jec
-     do i = G%isc, G%iec
-       h(i,j) = ...
-     enddo
-   enddo
-
-Bounds may extend into halos (e.g. derivatives)
 
 
 Message Passing
@@ -356,36 +379,51 @@ Checksums
 
 Verify the reproducibility of fields:
 
-==============    ============
-Field position    Checksum
-==============    ============
-Center            ``hchksum``
-Face              ``uvchksum``
-Vertex            ``Bchksum``
-==============    ============
-
 .. code:: fortran
 
+   ! Cell center
    call hchksum(Kh_h, "Kh_h", G%HI, scale=(US%L_to_m**2)*US%s_to_T)
-
+   ! Cell faces
    call uvchksum("Kh_[uv]", Kh_u, Kh_v, G%HI, &
                  scale=(US%L_to_m**2)*US%s_to_T, scalar_pair=.true.)
-
+   ! Cell vertex
    call Bchksum(Kh_q, "Kh_q", G%HI, scale=(US%L_to_m**2)*US%s_to_T)
 
-
-.. Sample debug output
-   -------------------
-
-   TODO
+See "MOM6 development" for more info
 
 
 Timers
 ======
 
+.. code:: fortran
+
+   ! Initialize timer
+   id_clock_ocean = cpu_clock_id('Ocean', grain=CLOCK_COMPONENT)
+
+   ! Main loop
+   
+   ! Start timer
+   call cpu_clock_begin(id_clock_ocean)
+
+   ! ... do some task
+
+   ! End timer
+   call cpu_clock_end(id_clock_ocean)
+
+Results printed to stdout at end of run
 
 
-Summary
-=======
+Other Topics
+============
 
-???
+* Restart field management (``register_restart_field()``)
+
+* Vertical regridding (``MOM_ALE.F90``)
+
+* Interacting with coupler
+
+   * ``forces``, ``fluxes``, etc
+
+   * Time interpolation
+
+* ``data_override()``
