@@ -112,7 +112,7 @@ GFDL Tools
 FMS Setup
 =========
 
-FMS is a climate model framework used at GFDL
+FMS is GFDL's climate model framework
 
 Create the ``path_names`` manifest:
 
@@ -137,13 +137,10 @@ Sample output::
 ``-l``
    Follow symbolic links (needed for MOM6)
 
-``<paths>``
+``<path> [<path> ...]``
    Directories to search for source
 
-``-o <out_file>``
-     Write report to file ``<out_file>``
-
-Default is ``path_names``
+Creates a file named ``path_names``
 
 
 Build FMS
@@ -220,20 +217,19 @@ Manifest:
        ../../src/MOM6/src/*/*/
 
 
-MOM6 paths
-==========
+MOM6 Build Config
+=================
 
-``config_src/infra/FMS1``
-   Framework (I/O, parallelization, output format, etc.)
+=======================================   ======================
+Directory                                 Component
+=======================================   ======================
+``config_src/infra/FMS1``                 Framework
+``config_src/memory/dynamic_symmetric``   Memory layout
+``config_src/drivers/solo_driver``        Target program/library
+``config_src/external``                   External packages
+=======================================   ======================
 
-``config_src/memory/dynamic_symmetric``
-   Memory layout (see "Internals" session)
-
-``config_src/drivers/solo_driver``
-   The "program": solo (ocean-only), coupled, etc.
-
-``config_src/external``
-   External packages (BGC, data assimilation, etc)
+See "Internals" talk for more information
 
 
 Build MOM6
@@ -259,7 +255,7 @@ More mkmf
 =========
 
 ``-o``
-   "Other flags", added to compiler (``-I../../shared/repro``)
+   "Other" flags (``-I../../shared/repro``)
 
 ``-l``
    Linker flags (``-L../../shared/repro -lfms``)

@@ -146,7 +146,7 @@ $ git submodule update --init --recursive</code></pre>
 
 <section id="fms-setup" class="title-slide slide level1">
 <h1>FMS Setup</h1>
-<p>FMS is a climate model framework used at GFDL</p>
+<p>FMS is GFDL's climate model framework</p>
 <p>Create the <code>path_names</code> manifest:</p>
 <pre class="sh"><code>$ mkdir -p build/fms
 $ cd build/fms
@@ -165,14 +165,11 @@ $ ../../src/mkmf/bin/list_paths -l ../../src/FMS</code></pre>
 <dt><code>-l</code></dt>
 <dd><p>Follow symbolic links (needed for MOM6)</p>
 </dd>
-<dt><code>&lt;paths&gt;</code></dt>
+<dt><code>&lt;path&gt; [&lt;path&gt; ...]</code></dt>
 <dd><p>Directories to search for source</p>
 </dd>
-<dt><code>-o &lt;out_file&gt;</code></dt>
-<dd><p>Write report to file <code>&lt;out_file&gt;</code></p>
-</dd>
 </dl>
-<p>Default is <code>path_names</code></p>
+<p>Creates a file named <code>path_names</code></p>
 </section>
 
 <section>
@@ -538,22 +535,35 @@ $ cd build/ocean_only</code></pre>
     ../../src/MOM6/src/*/*/</code></pre>
 </section>
 
-<section id="mom6-paths" class="title-slide slide level1">
-<h1>MOM6 paths</h1>
-<dl>
-<dt><code>config_src/infra/FMS1</code></dt>
-<dd><p>Framework (I/O, parallelization, output format, etc.)</p>
-</dd>
-<dt><code>config_src/memory/dynamic_symmetric</code></dt>
-<dd><p>Memory layout (see "Internals" session)</p>
-</dd>
-<dt><code>config_src/drivers/solo_driver</code></dt>
-<dd><p>The "program": solo (ocean-only), coupled, etc.</p>
-</dd>
-<dt><code>config_src/external</code></dt>
-<dd><p>External packages (BGC, data assimilation, etc)</p>
-</dd>
-</dl>
+<section id="mom6-build-config" class="title-slide slide level1">
+<h1>MOM6 Build Config</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Directory</th>
+<th>Component</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>config_src/infra/FMS1</code></td>
+<td>Framework</td>
+</tr>
+<tr class="even">
+<td><code>config_src/memory/dynamic_symmetric</code></td>
+<td>Memory layout</td>
+</tr>
+<tr class="odd">
+<td><code>config_src/drivers/solo_driver</code></td>
+<td>Target program/library</td>
+</tr>
+<tr class="even">
+<td><code>config_src/external</code></td>
+<td>External packages</td>
+</tr>
+</tbody>
+</table>
+<p>See "Internals" talk for more information</p>
 </section>
 
 <section id="build-mom6" class="title-slide slide level1">
@@ -573,7 +583,7 @@ $ cd build/ocean_only</code></pre>
 <h1>More mkmf</h1>
 <dl>
 <dt><code>-o</code></dt>
-<dd><p>"Other flags", added to compiler (<code>-I../../shared/repro</code>)</p>
+<dd><p>"Other" flags (<code>-I../../shared/repro</code>)</p>
 </dd>
 <dt><code>-l</code></dt>
 <dd><p>Linker flags (<code>-L../../shared/repro -lfms</code>)</p>
