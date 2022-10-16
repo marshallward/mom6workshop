@@ -24,20 +24,37 @@ Directory         Description
 ===============   =================================
 
 
-Configuration Code
-==================
+``config_src/drivers``
+======================
 
-* drivers
+===================     =========================
+Directory               Driver
+===================     =========================
+``solo_driver``         Ocean-only
+``ice_solo_driver``     Ice-ocean (MOM6-SIS2)
+``FMS_cap``             GFDL (FMS) coupler
+``nuopc_cap``           NUOPC coupler (CESM, UFS)
+``mct_cap``             MCT coupler
+===================     =========================
 
-* memory layout (symmetrics/nonsymmetric)
+New coupled models would be expected to develop their own drivers.
 
-* framework (infra/FMS1,FMS2)
 
-* externals
-   * biogeochemical model
-   * Data assimilation (ODA)
-   * database interface
-   * Python interface?
+Other configs
+=============
+
+``config_src/memory``
+   Symmetric, Non-symmetric, static (presented later)
+
+``config_src/infra``
+   FMS1, FMS2
+
+``config_src/external``
+   BGC, Data assimilation, Python interface, etc.
+
+Complex projects can add their own implementations
+
+.. TODO example?  cheng's builds?
 
 
 ``src/``
@@ -127,7 +144,7 @@ Horizontal viscosity                   ``horizontal_viscosity()``
 
 .. notes::
 
-   Note that this repeats in a predictor/corrector-like algorithm.
+   This repeats in a predictor/corrector-like algorithm.
 
 
 Thermodynamics
@@ -152,12 +169,35 @@ Tracers
 * step_forward_meke
 
 
-Metrics
-=======
+Metric Grids
+============
 
 .. image:: img/Arakawa_C_grid.png
 
 :math:`(i,j)` follows the "northeast convention"
+
+
+Memory Layout
+=============
+
+.. list-table::
+
+   * - Symmetric:
+
+       .. figure:: img/Horizontal_NE_indexing_sym.png
+
+
+     - Nonsymmetric:
+
+       .. figure:: img/Horizontal_NE_indexing_nonsym.png
+
+* Symmetric grids have additional west/south points
+
+* Index values unchanged (but symmetric B-grid is zero-indexed)
+
+.. notes::
+
+   If periodic, they match the east/north points
 
 
 Index Macros
@@ -176,36 +216,7 @@ North Face  ``v(SZI_(G), SZJB_(G), SZK_(G))``
 Vertex      ``q(SZIB_(G), SZJB_(G), SZK_(G))``
 ==========  ==================================
 
-Use ``ALLOCABLE_()`` to allocate (if static)
-
-
-.. Indexing
-   ========
-
-.. TODO * G, GV, etc
-
-        * IJ/ij syntax
-
-
-Memory Layout
-=============
-
-.. list-table::
-
-   * - Symmetric:
-
-       .. figure:: img/Horizontal_NE_indexing_sym.png
-
-
-     - Nonsymmetric:
-
-       .. figure:: img/Horizontal_NE_indexing_nonsym.png
-
-Symmetric grids have additional west/south points
-
-.. notes::
-
-   If periodic, they match the east/north points
+Use ``ALLOCABLE_()`` to allocate
 
 
 Parallelization
@@ -235,6 +246,22 @@ Stencil Domains
          Global indexing
 
 
+Index Bounds
+============
+
+Bounds stored in ``ocean_grid_type``, ``G``
+
+.. code::
+
+   do j = G%jsc, G%jec
+     do i = G%isc, G%iec
+       h(i,j) = ...
+     enddo
+   enddo
+
+Bounds may extend into halos (e.g. derivatives)
+
+
 Message Passing
 ===============
 
@@ -252,7 +279,7 @@ Message Passing
 
 
 Example halo update
--------------------
+===================
 
 .. code:: fortran
 
@@ -273,10 +300,10 @@ Example halo update
    endif
 
 
-Masking
-=======
+.. Masking
+   =======
 
-TODO
+   TODO
 
 
 Diagnostics
@@ -331,18 +358,25 @@ Vertex            ``Bchksum``
 .. code:: fortran
 
    call hchksum(Kh_h, "Kh_h", G%HI, scale=(US%L_to_m**2)*US%s_to_T)
+
    call uvchksum("Kh_[uv]", Kh_u, Kh_v, G%HI, &
                  scale=(US%L_to_m**2)*US%s_to_T, scalar_pair=.true.)
+
    call Bchksum(Kh_q, "Kh_q", G%HI, scale=(US%L_to_m**2)*US%s_to_T)
 
 
-Sample debug output
--------------------
+.. Sample debug output
+   -------------------
 
-TODO
+   TODO
 
 
 Timers
 ======
 
 
+
+Summary
+=======
+
+???

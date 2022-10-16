@@ -97,23 +97,55 @@
 </table>
 </section>
 
-<section id="configuration-code" class="title-slide slide level1">
-<h1>Configuration Code</h1>
-<ul>
-<li>drivers</li>
-<li>memory layout (symmetrics/nonsymmetric)</li>
-<li>framework (infra/FMS1,FMS2)</li>
-<li><dl>
-<dt>externals</dt>
-<dd><ul>
-<li>biogeochemical model</li>
-<li>Data assimilation (ODA)</li>
-<li>database interface</li>
-<li>Python interface?</li>
-</ul>
+<section id="config_srcdrivers" class="title-slide slide level1">
+<h1><code>config_src/drivers</code></h1>
+<table>
+<thead>
+<tr class="header">
+<th>Directory</th>
+<th>Driver</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>solo_driver</code></td>
+<td>Ocean-only</td>
+</tr>
+<tr class="even">
+<td><code>ice_solo_driver</code></td>
+<td>Ice-ocean (MOM6-SIS2)</td>
+</tr>
+<tr class="odd">
+<td><code>FMS_cap</code></td>
+<td>GFDL (FMS) coupler</td>
+</tr>
+<tr class="even">
+<td><code>nuopc_cap</code></td>
+<td>NUOPC coupler (CESM, UFS)</td>
+</tr>
+<tr class="odd">
+<td><code>mct_cap</code></td>
+<td>MCT coupler</td>
+</tr>
+</tbody>
+</table>
+<p>New coupled models would be expected to develop their own drivers.</p>
+</section>
+
+<section id="other-configs" class="title-slide slide level1">
+<h1>Other configs</h1>
+<dl>
+<dt><code>config_src/memory</code></dt>
+<dd><p>Symmetric, Non-symmetric, static (presented later)</p>
 </dd>
-</dl></li>
-</ul>
+<dt><code>config_src/infra</code></dt>
+<dd><p>FMS1, FMS2</p>
+</dd>
+<dt><code>config_src/external</code></dt>
+<dd><p>BGC, Data assimilation, Python interface, etc.</p>
+</dd>
+</dl>
+<p>Complex projects can add their own implementations</p>
 </section>
 
 <section id="src" class="title-slide slide level1">
@@ -883,7 +915,7 @@ end module MOM_geothermal
 </tbody>
 </table>
 <aside class="notes">
-<p>Note that this repeats in a predictor/corrector-like algorithm.</p>
+<p>This repeats in a predictor/corrector-like algorithm.</p>
 </aside>
 </section>
 
@@ -927,10 +959,35 @@ end module MOM_geothermal
 </ul>
 </section>
 
-<section id="metrics" class="title-slide slide level1">
-<h1>Metrics</h1>
+<section id="metric-grids" class="title-slide slide level1">
+<h1>Metric Grids</h1>
 <p><img data-src="img/Arakawa_C_grid.png" alt="image" /></p>
 <p><span class="math inline">\((i,j)\)</span> follows the "northeast convention"</p>
+</section>
+
+<section id="memory-layout" class="title-slide slide level1">
+<h1>Memory Layout</h1>
+<table>
+<tbody>
+<tr class="odd">
+<td><p>Symmetric:</p>
+<figure>
+<img data-src="img/Horizontal_NE_indexing_sym.png" />
+</figure></td>
+<td><p>Nonsymmetric:</p>
+<figure>
+<img data-src="img/Horizontal_NE_indexing_nonsym.png" />
+</figure></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Symmetric grids have additional west/south points</li>
+<li>Index values unchanged (but symmetric B-grid is zero-indexed)</li>
+</ul>
+<aside class="notes">
+<p>If periodic, they match the east/north points</p>
+</aside>
 </section>
 
 <section id="index-macros" class="title-slide slide level1">
@@ -963,29 +1020,7 @@ end module MOM_geothermal
 </tr>
 </tbody>
 </table>
-<p>Use <code>ALLOCABLE_()</code> to allocate (if static)</p>
-</section>
-
-<section id="memory-layout" class="title-slide slide level1">
-<h1>Memory Layout</h1>
-<table>
-<tbody>
-<tr class="odd">
-<td><p>Symmetric:</p>
-<figure>
-<img data-src="img/Horizontal_NE_indexing_sym.png" />
-</figure></td>
-<td><p>Nonsymmetric:</p>
-<figure>
-<img data-src="img/Horizontal_NE_indexing_nonsym.png" />
-</figure></td>
-</tr>
-</tbody>
-</table>
-<p>Symmetric grids have additional west/south points</p>
-<aside class="notes">
-<p>If periodic, they match the east/north points</p>
-</aside>
+<p>Use <code>ALLOCABLE_()</code> to allocate</p>
 </section>
 
 <section id="parallelization" class="title-slide slide level1">
@@ -1017,7 +1052,17 @@ end module MOM_geothermal
 </table>
 </section>
 
-<section>
+<section id="index-bounds" class="title-slide slide level1">
+<h1>Index Bounds</h1>
+<p>Bounds stored in <code>ocean_grid_type</code>, <code>G</code></p>
+<pre class=""><code>do j = G%jsc, G%jec
+  do i = G%isc, G%iec
+    h(i,j) = ...
+  enddo
+enddo</code></pre>
+<p>Bounds may extend into halos (e.g. derivatives)</p>
+</section>
+
 <section id="message-passing" class="title-slide slide level1">
 <h1>Message Passing</h1>
 <dl>
@@ -1035,8 +1080,9 @@ end module MOM_geothermal
 </dd>
 </dl>
 </section>
-<section id="example-halo-update" class="slide level2">
-<h2>Example halo update</h2>
+
+<section id="example-halo-update" class="title-slide slide level1">
+<h1>Example halo update</h1>
 <pre class="fortran"><code>call create_group_pass(CS%pass_uv, u, v, G%Domain, &amp;
                        halo=max(2,cont_stencil))
 
@@ -1052,10 +1098,6 @@ if (G%nonblocking_updates) then
 else
   call do_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
 endif</code></pre>
-</section></section>
-<section id="masking" class="title-slide slide level1">
-<h1>Masking</h1>
-<p>TODO</p>
 </section>
 
 <section id="diagnostics" class="title-slide slide level1">
@@ -1082,7 +1124,6 @@ endif</code></pre>
 )</code></pre>
 </section>
 
-<section>
 <section id="checksums" class="title-slide slide level1">
 <h1>Checksums</h1>
 <p>Verify the reproducibility of fields:</p>
@@ -1109,17 +1150,21 @@ endif</code></pre>
 </tbody>
 </table>
 <pre class="fortran"><code>call hchksum(Kh_h, &quot;Kh_h&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)
+
 call uvchksum(&quot;Kh_[uv]&quot;, Kh_u, Kh_v, G%HI, &amp;
               scale=(US%L_to_m**2)*US%s_to_T, scalar_pair=.true.)
+
 call Bchksum(Kh_q, &quot;Kh_q&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)</code></pre>
 </section>
-<section id="sample-debug-output" class="slide level2">
-<h2>Sample debug output</h2>
-<p>TODO</p>
-</section></section>
+
 <section id="timers" class="title-slide slide level1">
 <h1>Timers</h1>
 
+</section>
+
+<section id="summary" class="title-slide slide level1">
+<h1>Summary</h1>
+<p>???</p>
 </section>
     </div>
   </div>
