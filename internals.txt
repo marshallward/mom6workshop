@@ -94,15 +94,15 @@ Ordering is somewhat configurable
 
 ``step_MOM_dynamics()``
 
-========================   ============================
-Process                    Subroutine
-========================   ============================
-Thickness Diffusion        ``thickness_diffuse()``
-Bottom drag                ``set_viscous_BBL()``
-Flow transport             ``step_MOM_dyn_split_RK2()``
-ML restratification        ``mixedlayer_restrat()``
-Mesoscale eddy param.      ``step_forward_MEKE()``
-========================   ============================
+===================  ============================
+Process              Subroutine
+===================  ============================
+Thickness Diffusion  ``thickness_diffuse()``
+Bottom drag          ``set_viscous_BBL()``
+Flow transport       ``step_MOM_dyn_split_RK2()``
+ML restratification  ``mixedlayer_restrat()``
+Mesoscale eddies     ``step_forward_MEKE()``
+===================  ============================
 
 .. notes::
 
@@ -238,13 +238,65 @@ Stencil Domains
 Message Passing
 ===============
 
-* ``group_pass`` etc
+``create_group_pass(group, array, domain)``
+   Create a "group pass" for an array
+
+``do_group_pass(group, domain)``
+   Immediately update the halo ("blocking")
+
+``start_group_pass(group, domain)``
+   Begin a halo update ("nonblocking")
+
+``complete_group_pass(group, domain)``
+   Wait until a halo update has completed
+
+
+Example halo update
+-------------------
+
+.. code:: fortran
+
+   call create_group_pass(CS%pass_uv, u, v, G%Domain, &
+                          halo=max(2,cont_stencil))
+
+   ! Update u and v
+
+   if (G%nonblocking_updates) &
+      call start_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
+
+   ! Do some work unrelated to u and v
+
+   if (G%nonblocking_updates) then
+     call complete_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
+   else
+     call do_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
+   endif
 
 
 Masking
 =======
 
 TODO
+
+
+Diagnostics
+===========
+
+``register_diag_field()``
+
+.. code:: fortran
+
+   CS%id_Kh_h = register_diag_field('ocean_model', 'Khh', &
+      diag%axesTL, Time, &
+      'Laplacian Horizontal Viscosity at h Points', &
+      'm2 s-1', &
+      conversion=(US%L_to_m**2)*US%s_to_T)
+
+``post_data()``
+
+.. code:: fortran
+
+   if (CS%id_Kh_h > 0) call post_data(CS%id_Kh_h, Kh_h, CS%diag)
 
 
 Input Parameters
@@ -268,18 +320,26 @@ Checksums
 
 Verify the reproducibility of fields:
 
-* ``hchksum``: Cell centers
+==============    ============
+Field position    Checksum
+==============    ============
+Center            ``hchksum``
+Face              ``uvchksum``
+Vertex            ``Bchksum``
+==============    ============
 
-* ``uvchksum``: Cell faces
+.. code:: fortran
 
-* ``Bchksum``: Cell vertices
+   call hchksum(Kh_h, "Kh_h", G%HI, scale=(US%L_to_m**2)*US%s_to_T)
+   call uvchksum("Kh_[uv]", Kh_u, Kh_v, G%HI, &
+                 scale=(US%L_to_m**2)*US%s_to_T, scalar_pair=.true.)
+   call Bchksum(Kh_q, "Kh_q", G%HI, scale=(US%L_to_m**2)*US%s_to_T)
 
 
-Diagnostics
-===========
+Sample debug output
+-------------------
 
-* ``register_diag_field()``
-* ``post_data()``
+TODO
 
 
 Timers

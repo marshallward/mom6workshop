@@ -835,7 +835,7 @@ end module MOM_geothermal
 <td><code>mixedlayer_restrat()</code></td>
 </tr>
 <tr class="odd">
-<td>Mesoscale eddy param.</td>
+<td>Mesoscale eddies</td>
 <td><code>step_forward_MEKE()</code></td>
 </tr>
 </tbody>
@@ -1017,16 +1017,57 @@ end module MOM_geothermal
 </table>
 </section>
 
+<section>
 <section id="message-passing" class="title-slide slide level1">
 <h1>Message Passing</h1>
-<ul>
-<li><code>group_pass</code> etc</li>
-</ul>
+<dl>
+<dt><code>create_group_pass(group, array, domain)</code></dt>
+<dd><p>Create a "group pass" for an array</p>
+</dd>
+<dt><code>do_group_pass(group, domain)</code></dt>
+<dd><p>Immediately update the halo ("blocking")</p>
+</dd>
+<dt><code>start_group_pass(group, domain)</code></dt>
+<dd><p>Begin a halo update ("nonblocking")</p>
+</dd>
+<dt><code>complete_group_pass(group, domain)</code></dt>
+<dd><p>Wait until a halo update has completed</p>
+</dd>
+</dl>
 </section>
+<section id="example-halo-update" class="slide level2">
+<h2>Example halo update</h2>
+<pre class="fortran"><code>call create_group_pass(CS%pass_uv, u, v, G%Domain, &amp;
+                       halo=max(2,cont_stencil))
 
+! Update u and v
+
+if (G%nonblocking_updates) &amp;
+   call start_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
+
+! Do some work unrelated to u and v
+
+if (G%nonblocking_updates) then
+  call complete_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
+else
+  call do_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
+endif</code></pre>
+</section></section>
 <section id="masking" class="title-slide slide level1">
 <h1>Masking</h1>
 <p>TODO</p>
+</section>
+
+<section id="diagnostics" class="title-slide slide level1">
+<h1>Diagnostics</h1>
+<p><code>register_diag_field()</code></p>
+<pre class="fortran"><code>CS%id_Kh_h = register_diag_field(&#39;ocean_model&#39;, &#39;Khh&#39;, &amp;
+   diag%axesTL, Time, &amp;
+   &#39;Laplacian Horizontal Viscosity at h Points&#39;, &amp;
+   &#39;m2 s-1&#39;, &amp;
+   conversion=(US%L_to_m**2)*US%s_to_T)</code></pre>
+<p><code>post_data()</code></p>
+<pre class="fortran"><code>if (CS%id_Kh_h &gt; 0) call post_data(CS%id_Kh_h, Kh_h, CS%diag)</code></pre>
 </section>
 
 <section id="input-parameters" class="title-slide slide level1">
@@ -1041,24 +1082,41 @@ end module MOM_geothermal
 )</code></pre>
 </section>
 
+<section>
 <section id="checksums" class="title-slide slide level1">
 <h1>Checksums</h1>
 <p>Verify the reproducibility of fields:</p>
-<ul>
-<li><code>hchksum</code>: Cell centers</li>
-<li><code>uvchksum</code>: Cell faces</li>
-<li><code>Bchksum</code>: Cell vertices</li>
-</ul>
+<table>
+<thead>
+<tr class="header">
+<th>Field position</th>
+<th>Checksum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Center</td>
+<td><code>hchksum</code></td>
+</tr>
+<tr class="even">
+<td>Face</td>
+<td><code>uvchksum</code></td>
+</tr>
+<tr class="odd">
+<td>Vertex</td>
+<td><code>Bchksum</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="fortran"><code>call hchksum(Kh_h, &quot;Kh_h&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)
+call uvchksum(&quot;Kh_[uv]&quot;, Kh_u, Kh_v, G%HI, &amp;
+              scale=(US%L_to_m**2)*US%s_to_T, scalar_pair=.true.)
+call Bchksum(Kh_q, &quot;Kh_q&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)</code></pre>
 </section>
-
-<section id="diagnostics" class="title-slide slide level1">
-<h1>Diagnostics</h1>
-<ul>
-<li><code>register_diag_field()</code></li>
-<li><code>post_data()</code></li>
-</ul>
-</section>
-
+<section id="sample-debug-output" class="slide level2">
+<h2>Sample debug output</h2>
+<p>TODO</p>
+</section></section>
 <section id="timers" class="title-slide slide level1">
 <h1>Timers</h1>
 
