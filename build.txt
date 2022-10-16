@@ -9,6 +9,12 @@ Building MOM6
 :preface:
    TODO
 
+----
+
+Presentation slides are available at
+
+https://marshallward.org/mom6workshop/build.html
+
 
 Preparation
 ===========
@@ -161,18 +167,6 @@ and build::
    $ make NETCDF=3 REPRO=1 libfms.a -j
 
 
-Recommended Templates
----------------------
-
-========    =========================
-Platform    Template
-========    =========================
-Gaea        ncrc-gnu.mk
-Stellar     linux-ubuntu-jammy-gnu.mk
-Ubuntu      linux-ubuntu-jammy-gnu.mk
-MacOS       osx-gcc10.mk
-========    =========================
-
 ``mkmf``
 ========
 
@@ -193,6 +187,19 @@ MKMF Template
    :code:
 
 ``NETCDF=3`` and ``REPRO=1`` are defined in templates
+
+
+Recommended Templates
+=====================
+
+========    =========================
+Platform    Template
+========    =========================
+Gaea        ncrc-gnu.mk
+Stellar     linux-ubuntu-jammy-gnu.mk
+Ubuntu      linux-ubuntu-jammy-gnu.mk
+MacOS       osx-gcc10.mk
+========    =========================
 
 
 MOM6 Setup

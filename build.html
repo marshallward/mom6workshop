@@ -63,6 +63,11 @@
   </aside>
 </section>
 
+<section class="slide level2">
+
+<p>Presentation slides are available at</p>
+<p><a href="https://marshallward.org/mom6workshop/build.html">https://marshallward.org/mom6workshop/build.html</a></p>
+</section>
 <section>
 <section id="preparation" class="title-slide slide level1">
 <h1>Preparation</h1>
@@ -172,7 +177,6 @@ $ ../../src/mkmf/bin/list_paths -l ../../src/FMS</code></pre>
 <p>Creates a file named <code>path_names</code></p>
 </section>
 
-<section>
 <section id="build-fms" class="title-slide slide level1">
 <h1>Build FMS</h1>
 <p>Generate the Makefile:</p>
@@ -184,35 +188,7 @@ $ ../../src/mkmf/bin/list_paths -l ../../src/FMS</code></pre>
 <p>and build:</p>
 <pre><code>$ make NETCDF=3 REPRO=1 libfms.a -j</code></pre>
 </section>
-<section id="recommended-templates" class="slide level2">
-<h2>Recommended Templates</h2>
-<table>
-<thead>
-<tr class="header">
-<th>Platform</th>
-<th>Template</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Gaea</td>
-<td>ncrc-gnu.mk</td>
-</tr>
-<tr class="even">
-<td>Stellar</td>
-<td>linux-ubuntu-jammy-gnu.mk</td>
-</tr>
-<tr class="odd">
-<td>Ubuntu</td>
-<td>linux-ubuntu-jammy-gnu.mk</td>
-</tr>
-<tr class="even">
-<td>MacOS</td>
-<td>osx-gcc10.mk</td>
-</tr>
-</tbody>
-</table>
-</section></section>
+
 <section id="mkmf" class="title-slide slide level1">
 <h1><code>mkmf</code></h1>
 <dl>
@@ -518,6 +494,36 @@ TMPFILES = .*.m *.B *.L *.i *.i90 *.l *.s *.mod *.opt
 	$(FC) $(CPPDEFS) $(FPPFLAGS) $(FFLAGS) -o $*.x $*.F90 *.o $(LDFLAGS)
 </code></pre>
 <p><code>NETCDF=3</code> and <code>REPRO=1</code> are defined in templates</p>
+</section>
+
+<section id="recommended-templates" class="title-slide slide level1">
+<h1>Recommended Templates</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Platform</th>
+<th>Template</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gaea</td>
+<td>ncrc-gnu.mk</td>
+</tr>
+<tr class="even">
+<td>Stellar</td>
+<td>linux-ubuntu-jammy-gnu.mk</td>
+</tr>
+<tr class="odd">
+<td>Ubuntu</td>
+<td>linux-ubuntu-jammy-gnu.mk</td>
+</tr>
+<tr class="even">
+<td>MacOS</td>
+<td>osx-gcc10.mk</td>
+</tr>
+</tbody>
+</table>
 </section>
 
 <section id="mom6-setup" class="title-slide slide level1">

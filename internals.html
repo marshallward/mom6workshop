@@ -803,7 +803,7 @@ end module MOM_geothermal
 </code></pre>
 <ul>
 <li>One module per file</li>
-<li>Module communication by <strong>control structures</strong></li>
+<li>Modules communicate by <strong>control structures</strong></li>
 <li>No internal module variables (i.e. no "state")</li>
 </ul>
 <aside class="notes">
@@ -1086,7 +1086,8 @@ enddo</code></pre>
 <pre class="fortran"><code>call create_group_pass(CS%pass_uv, u, v, G%Domain, &amp;
                        halo=max(2,cont_stencil))
 
-! Update u and v
+u(:,:,:) = ...        ! Update compute domains
+v(:,:,:) = ...
 
 if (G%nonblocking_updates) &amp;
    call start_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)

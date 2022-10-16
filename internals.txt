@@ -81,7 +81,7 @@ Module Format
    :code: fortran
 
 * One module per file
-* Module communication by **control structures**
+* Modules communicate by **control structures**
 * No internal module variables (i.e. no "state")
 
 .. notes::
@@ -286,7 +286,8 @@ Example halo update
    call create_group_pass(CS%pass_uv, u, v, G%Domain, &
                           halo=max(2,cont_stencil))
 
-   ! Update u and v
+   u(:,:,:) = ...        ! Update compute domains
+   v(:,:,:) = ...
 
    if (G%nonblocking_updates) &
       call start_group_pass(CS%pass_uv, G%Domain, clock=id_clock_pass)
