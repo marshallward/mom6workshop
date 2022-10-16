@@ -42,20 +42,18 @@ HPC systems use environment modules::
    module swap gcc gcc/9.3.0
    module load cray-netcdf
 
-.. Template file: ``ncrc-gnu.mk``
-
 
 Stellar
 -------
 
 Similar to Gaea::
 
-   module load gcc-toolset/10
-   openmpi/gcc/4.1.0
-   hdf5/gcc-toolset-10/1.10.6
-   netcdf/gcc/hdf5-1.10.6/4.7.4
+   module purge
 
-.. Template: ``linux-ubuntu-jammy-gnu.mk``
+   module load gcc-toolset/10
+   module load openmpi/gcc/4.1.0
+   module load hdf5/gcc-toolset-10/1.10.6
+   module load netcdf/gcc/hdf5-1.10.6/4.7.4
 
 
 Ubuntu/Debian
@@ -82,6 +80,8 @@ MacOS is a minefield!  But Homebrew has the best chance::
    brew install mpich
    brew install netcdf
    brew install netcdf-fortran
+
+Software can also be installed with Conda.
 
 
 Get the Code
@@ -255,8 +255,8 @@ Make it::
    $ make NETCDF=3 REPRO=1 MOM6 -j
 
 
-mkmf part deux
-==============
+More mkmf
+=========
 
 ``-o``
    "Other flags", added to compiler (``-I../../shared/repro``)
@@ -272,18 +272,15 @@ Test the executable::
 
    $ cd ../../ocean_only/double_gyre
    $ ../../build/ocean_only/MOM6
+   $ mkdir RESTART
 
-If you see some output like this::
+Expected output:
 
-   FATAL: get_ascii_file_num_lines: File input.nml does not exist.
-   
-   
-   FATAL: get_ascii_file_num_lines: File input.nml does not exist.
-
-then you are ready.
+.. include:: doc/double_gyre_output.txt
+   :code:
 
 
-Exercises 
+Exercises
 =========
 
 1. Build the ice-ocean model using mkmf:
