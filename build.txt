@@ -236,7 +236,7 @@ Directory                                 Component
 ``config_src/external``                   External packages
 =======================================   ======================
 
-See "Internals" talk for more information
+See "MOM6 Internals" for more information
 
 
 Build MOM6
@@ -258,8 +258,8 @@ Make it::
    $ make NETCDF=3 REPRO=1 MOM6 -j
 
 
-More mkmf
-=========
+mkmf part 2
+===========
 
 ``-o``
    "Other" flags (``-I../../shared/repro``)
@@ -290,11 +290,11 @@ Exercises
 
    https://github.com/NOAA-GFDL/MOM6-examples/wiki/Getting-started#compiling-mom6-in-mom6-sis2-coupled-mode
 
-2. Attempt the MOM6 autoconf build and run the test suite:
+2. Build MOM6 using autoconf and run the test suite:
 
    https://github.com/NOAA-GFDL/MOM6/tree/dev/gfdl/ac
 
-   To run the test suite::
+3. Attempt to run the test suite::
 
       $ cd src/MOM6/.testing
       $ make -j

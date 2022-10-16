@@ -569,7 +569,7 @@ $ cd build/ocean_only</code></pre>
 </tr>
 </tbody>
 </table>
-<p>See "Internals" talk for more information</p>
+<p>See "MOM6 Internals" for more information</p>
 </section>
 
 <section id="build-mom6" class="title-slide slide level1">
@@ -585,8 +585,8 @@ $ cd build/ocean_only</code></pre>
 <pre><code>$ make NETCDF=3 REPRO=1 MOM6 -j</code></pre>
 </section>
 
-<section id="more-mkmf" class="title-slide slide level1">
-<h1>More mkmf</h1>
+<section id="mkmf-part-2" class="title-slide slide level1">
+<h1>mkmf part 2</h1>
 <dl>
 <dt><code>-o</code></dt>
 <dd><p>"Other" flags (<code>-I../../shared/repro</code>)</p>
@@ -733,9 +733,9 @@ WARNING: MPP_OPEN: File exitcode opened WRONLY already exists!
 <ol type="1">
 <li><p>Build the ice-ocean model using mkmf:</p>
 <p><a href="https://github.com/NOAA-GFDL/MOM6-examples/wiki/Getting-started#compiling-mom6-in-mom6-sis2-coupled-mode">https://github.com/NOAA-GFDL/MOM6-examples/wiki/Getting-started#compiling-mom6-in-mom6-sis2-coupled-mode</a></p></li>
-<li><p>Attempt the MOM6 autoconf build and run the test suite:</p>
-<p><a href="https://github.com/NOAA-GFDL/MOM6/tree/dev/gfdl/ac">https://github.com/NOAA-GFDL/MOM6/tree/dev/gfdl/ac</a></p>
-<p>To run the test suite:</p>
+<li><p>Build MOM6 using autoconf and run the test suite:</p>
+<p><a href="https://github.com/NOAA-GFDL/MOM6/tree/dev/gfdl/ac">https://github.com/NOAA-GFDL/MOM6/tree/dev/gfdl/ac</a></p></li>
+<li><p>Attempt to run the test suite:</p>
 <pre><code>$ cd src/MOM6/.testing
 $ make -j
 $ make -j test</code></pre></li>

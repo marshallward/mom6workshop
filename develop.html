@@ -63,8 +63,123 @@
   </aside>
 </section>
 
-<section class="slide level2">
+<section id="the-mom6-test-suite" class="title-slide slide level1">
+<h1>The MOM6 Test Suite</h1>
 
+</section>
+
+<section id="style-guide" class="title-slide slide level1">
+<h1>Style Guide</h1>
+<p>Main rules:</p>
+<ul>
+<li>Indent properly!</li>
+<li>Respect line length (&lt;=120 characters)</li>
+<li><code>snake_case</code></li>
+<li>Index convention (<code>i/j</code> on centers, <code>I/J</code> on edges)</li>
+<li><dl>
+<dt>Array syntax:</dt>
+<dd><ul>
+<li>This is bad: <code>u = 0.</code></li>
+<li><dl>
+<dt>This is OK: <code>u(:,:,:) = 0.</code></dt>
+<dd><ul>
+<li>But only for assignment and initialization</li>
+</ul>
+</dd>
+</dl></li>
+</ul>
+</dd>
+</dl></li>
+</ul>
+<p>See <a href="https://github.com/mom-ocean/MOM6/wiki/Code-style-guide">https://github.com/mom-ocean/MOM6/wiki/Code-style-guide</a></p>
+</section>
+
+<section id="numerical-style" class="title-slide slide level1">
+<h1>Numerical "style"</h1>
+<ul>
+<li>No ambiguous ordering
+<ul>
+<li>Bad: <code>a + b + c</code></li>
+<li>OK: <code>(a + b) + c</code></li>
+</ul></li>
+<li>No double divisions:
+<ul>
+<li>Bad: <code>a / (b + c / d)</code></li>
+<li>Better: <code>a * d / (b * d + c)</code></li>
+</ul></li>
+<li>Use "inverse" variables for repeated divisions:
+<ul>
+<li><code>Iarea = 1.0 / area</code></li>
+<li><code>u = a * Iarea;    v = b * Iarea</code></li>
+</ul></li>
+</ul>
+</section>
+
+<section id="more-numeric-tricks" class="title-slide slide level1">
+<h1>More numeric tricks</h1>
+<p>If-statements in loops suppress vectorization:</p>
+<pre class="fortran"><code>do j=jsc,jec ; do i=isc,jec
+   a = b + c
+   if (some_feature) a = a + d
+enddo ; enddo</code></pre>
+<p>Split the loop, move outside:</p>
+<pre class="fortran"><code>do j=jsc,jec ; do i=isc,jec
+   a = b + c
+enddo ; enddo
+if (some_feature) then
+   do j=jsc,jec ; do i=isc,jec
+      a = a + d
+   enddo ; enddo
+endif</code></pre>
+</section>
+
+<section id="debug-mode" class="title-slide slide level1">
+<h1>Debug Mode</h1>
+<p>In <code>MOM_input</code>:</p>
+<pre><code>DEBUG=True</code></pre>
+<p>This enables checksums in the output:</p>
+<pre><code>u-point: mean=   4.5198826930130449E-02 min=  -2.2679844164834517E-03 max=   3.6386233175123922E-01 u Beginning of step_MOM  [uv]
+u-point: c=    320978 sw=    316992 se=    316992 nw=    316992 ne=    316992 u Beginning of step_MOM  [uv]
+v-point: mean=   0.0000000000000000E+00 min=   0.0000000000000000E+00 max=   0.0000000000000000E+00 v Beginning of step_MOM  [uv]
+v-point: c=         0 sw=         0 se=         0 nw=         0 ne=         0 v Beginning of step_MOM  [uv]
+h-point: mean=   1.0000000000000000E+03 min=   2.0022236368437586E+02 max=   1.7997776363156240E+03 Beginning of step_MOM  h
+h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h</code></pre>
+<p>Send to stderr (expect a <em>lot</em>, reduce run time!)</p>
+</section>
+
+<section id="debug-syntax" class="title-slide slide level1">
+<h1>Debug Syntax</h1>
+<dl>
+<dt><code>h-point:</code></dt>
+<dd><p>Diagnostic is on a center point</p>
+</dd>
+<dt><code>mean</code>, <code>min</code>, <code>max</code></dt>
+<dd><p>Calculated over the compute domain (no halos)</p>
+</dd>
+<dt><code>c=</code></dt>
+<dd><p>Bit checksum over compute domain</p>
+</dd>
+<dt><code>sw=</code>, <code>se=</code>, <code>nw=</code>, <code>ne=</code></dt>
+<dd><p>Checksum after domain shifted into halos</p>
+</dd>
+</dl>
+</section>
+
+<section id="exercise-1" class="title-slide slide level1">
+<h1>Exercise 1</h1>
+<p>Check out fork and compile:</p>
+<pre class="fortran"><code>cd MOM6-examples/src/MOM6
+git fetch
+git checkout demo-layout-issue
+# You remember how to compile, right?</code></pre>
+<p>Run with 1 and 4 CPUs</p>
+<pre class="fortran"><code>cd ../../ocean_only/Phillips_2layer
+mpirun -np 1 ../../build/ocean_only/MOM6
+cp ocean.stats ocean.stats.p1
+mpirun -np 4 ../../build/ocean_only/MOM6
+cp ocean.stats ocean.stats.p4
+diff ocean.stats.p1 ocean.stats.p4</code></pre>
+<p>Find the issue and submit a fix (?)</p>
 </section>
     </div>
   </div>

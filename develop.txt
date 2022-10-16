@@ -3,11 +3,132 @@ MOM6 Development
 ================
 
 :author: Marshall Ward
-:description: MOM6 feature development
+:description: MOM6 development topics
 :date: 2022-10-18
 :url: https://marshallward.org/mom6workshop/develop.html
 :preface:
    TODO
 
 
+The MOM6 Test Suite
+===================
 
+
+Style Guide
+===========
+
+Main rules:
+
+* Indent properly!
+* Respect line length (<=120 characters)
+* ``snake_case``
+* Index convention (``i/j`` on centers, ``I/J`` on edges)
+* Array syntax:
+   * This is bad: ``u = 0.``
+   * This is OK: ``u(:,:,:) = 0.``
+      * But only for assignment and initialization
+
+See https://github.com/mom-ocean/MOM6/wiki/Code-style-guide
+
+
+Numerical "style"
+=================
+
+* No ambiguous ordering
+  * Bad: ``a + b + c``
+  * OK: ``(a + b) + c``
+
+* No double divisions:
+  * Bad: ``a / (b + c / d)``
+  * Better: ``a * d / (b * d + c)``
+
+* Use "inverse" variables for repeated divisions:
+  * ``Iarea = 1.0 / area``
+  * ``u = a * Iarea;    v = b * Iarea``
+
+
+More numeric tricks
+===================
+
+If-statements in loops suppress vectorization:
+
+.. code:: fortran
+
+   do j=jsc,jec ; do i=isc,jec
+      a = b + c
+      if (some_feature) a = a + d
+   enddo ; enddo
+
+Split the loop, move outside:
+
+.. code:: fortran
+
+   do j=jsc,jec ; do i=isc,jec
+      a = b + c
+   enddo ; enddo
+   if (some_feature) then
+      do j=jsc,jec ; do i=isc,jec
+         a = a + d
+      enddo ; enddo
+   endif
+
+
+Debug Mode
+==========
+
+In ``MOM_input``::
+
+   DEBUG=True
+
+This enables checksums in the output::
+
+  u-point: mean=   4.5198826930130449E-02 min=  -2.2679844164834517E-03 max=   3.6386233175123922E-01 u Beginning of step_MOM  [uv]
+  u-point: c=    320978 sw=    316992 se=    316992 nw=    316992 ne=    316992 u Beginning of step_MOM  [uv]
+  v-point: mean=   0.0000000000000000E+00 min=   0.0000000000000000E+00 max=   0.0000000000000000E+00 v Beginning of step_MOM  [uv]
+  v-point: c=         0 sw=         0 se=         0 nw=         0 ne=         0 v Beginning of step_MOM  [uv]
+  h-point: mean=   1.0000000000000000E+03 min=   2.0022236368437586E+02 max=   1.7997776363156240E+03 Beginning of step_MOM  h
+  h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h
+
+Send to stderr (expect a *lot*, reduce run time!)
+
+
+Debug Syntax
+============
+
+``h-point:``
+   Diagnostic is on a center point
+
+``mean``, ``min``, ``max``
+   Calculated over the compute domain (no halos)
+
+``c=``
+   Bit checksum over compute domain
+
+``sw=``, ``se=``, ``nw=``, ``ne=``
+   Checksum after domain shifted into halos
+
+
+Exercise 1
+==========
+
+Check out fork and compile:
+
+.. code:: fortran
+
+   cd MOM6-examples/src/MOM6
+   git fetch
+   git checkout demo-layout-issue
+   # You remember how to compile, right?
+
+Run with 1 and 4 CPUs
+
+.. code:: fortran
+
+   cd ../../ocean_only/Phillips_2layer
+   mpirun -np 1 ../../build/ocean_only/MOM6
+   cp ocean.stats ocean.stats.p1
+   mpirun -np 4 ../../build/ocean_only/MOM6
+   cp ocean.stats ocean.stats.p4
+   diff ocean.stats.p1 ocean.stats.p4
+
+Find the issue and submit a fix (?)

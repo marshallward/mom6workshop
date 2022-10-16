@@ -160,7 +160,7 @@
 <tbody>
 <tr class="odd">
 <td><code>core/</code></td>
-<td>Init, Timestep, main solvers</td>
+<td>Init, time-step, solvers</td>
 </tr>
 <tr class="even">
 <td><code>parameterizations/</code></td>
@@ -823,11 +823,11 @@ end module MOM_geothermal
 </thead>
 <tbody>
 <tr class="odd">
-<td>Dynamics</td>
+<td>Fluid Transport</td>
 <td><code>step_MOM_dynamics()</code></td>
 </tr>
 <tr class="even">
-<td>Thermodynamics</td>
+<td>Diabatic forcing</td>
 <td><code>step_MOM_thermo()</code></td>
 </tr>
 <tr class="odd">
@@ -851,7 +851,7 @@ end module MOM_geothermal
 </thead>
 <tbody>
 <tr class="odd">
-<td>Thickness Diffusion</td>
+<td>GM, Redi diffusion</td>
 <td><code>thickness_diffuse()</code></td>
 </tr>
 <tr class="even">
@@ -919,34 +919,21 @@ end module MOM_geothermal
 </aside>
 </section>
 
-<section id="thermodynamics" class="title-slide slide level1">
-<h1>Thermodynamics</h1>
-<table>
-<thead>
-<tr class="header">
-<th>Process</th>
-<th>Subroutine</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>diabatic</td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>adiabatic</td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>ALE_main</td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>diag_update_remap_grids</td>
-<td>???</td>
-</tr>
-</tbody>
-</table>
+<section id="diabatic-forcing" class="title-slide slide level1">
+<h1>Diabatic Forcing</h1>
+<p><code>src/paramerizations/vertical/MOM_diabatic_driver.F90</code></p>
+<p>Many parameterizations are applied via <code>diabatic()</code></p>
+<ul>
+<li>Geothermal heating</li>
+<li>KPP (vertical) mixing</li>
+<li>Bulk mixed layer</li>
+<li>Convective mixing (CVMix)</li>
+<li>Shortwave radiative heating</li>
+</ul>
+<p>If <code>adiabatic()</code>, comparatively little happens here</p>
+<aside class="notes">
+<p>There are two diabatic functions: diabatic_ALE() and layered_diabatic() (actually two ALE functions! But nevermind that)</p>
+</aside>
 </section>
 
 <section id="tracers" class="title-slide slide level1">
