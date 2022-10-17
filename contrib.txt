@@ -103,8 +103,15 @@ Commiting Changes
 
 ====
 
-Linus quote
+.. image:: img/linus_dirk.png
+   :target: https://www.youtube.com/watch?v=H8Gd9t7FQqI
+   :width: 60%
 
+Linus Torvalds, Linux OSS 2020
+
+   Commit messages to me are almost as important as the code change itself.
+
+   If you can explain the code change to me, I will trust the code.
 
 Preparing the Pull Request
 ==========================

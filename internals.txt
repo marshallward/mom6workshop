@@ -122,7 +122,7 @@ Ordering is somewhat configurable
 ===================  ============================
 Process              Subroutine
 ===================  ============================
-GM, Redi diffusion   ``thickness_diffuse()``
+GM diffusion         ``thickness_diffuse()``
 Bottom drag          ``set_viscous_BBL()``
 Flow transport       ``step_MOM_dyn_split_RK2()``
 ML restratification  ``mixedlayer_restrat()``
@@ -158,7 +158,7 @@ Horizontal viscosity                   ``horizontal_viscosity()``
 Diabatic Forcing
 ================
 
-``src/paramerizations/vertical/MOM_diabatic_driver.F90``
+``MOM_diabatic_driver.F90``
 
 Many parameterizations are applied via ``diabatic()``
 
@@ -179,10 +179,25 @@ If ``adiabatic()``, comparatively less happens here
 Tracers
 =======
 
-* advect_tracer
-* tracer_hordiff
-* update_segment_tracer_reservoirs
-* step_forward_meke
+``MOM_tracer_{advect,hor_diff}.F90``
+
+* ``advect_tracer()``
+
+   * ``advect_x()``
+
+   * ``advect_y()``
+
+* ``tracer_hordiff()``
+
+   * ``neutral_diffusion()``
+
+* ``tracer_vertdiff()`` (diabatic)
+
+Certain tracers are implemented in-code (age, CFC, etc)
+
+.. notes::
+
+   OBC corrections are prevalent here
 
 
 Metric Grids
@@ -413,17 +428,25 @@ Timers
 Results printed to stdout at end of run
 
 
-Other Topics
-============
+Exercise
+========
 
-* Restart field management (``register_restart_field()``)
+Create a new diagnostic and generate the output.
 
-* Vertical regridding (``MOM_ALE.F90``)
+An simple example is enstrophy density,
+:math:`\tfrac{1}{2} \left| \nabla \times \mathbf{u} \right|^2`, i.e. square of
+vorticity.  You could also use its potential vorticity equivalent.
 
-* Interacting with coupler
+You are welcome to create your own diagnostic!
 
-   * ``forces``, ``fluxes``, etc
 
-   * Time interpolation
+Outline
+-------
 
-* ``data_override()``
+1. Register with ``register_diag_field()``, save id
+
+2. Compute the field
+
+3. Pass id and field to ``post_data()``
+
+4. Enable the diagnostic in ``diag_table``

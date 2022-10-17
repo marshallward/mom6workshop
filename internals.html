@@ -857,7 +857,7 @@ end module MOM_geothermal
 </thead>
 <tbody>
 <tr class="odd">
-<td>GM, Redi diffusion</td>
+<td>GM diffusion</td>
 <td><code>thickness_diffuse()</code></td>
 </tr>
 <tr class="even">
@@ -927,7 +927,7 @@ end module MOM_geothermal
 
 <section id="diabatic-forcing" class="title-slide slide level1">
 <h1>Diabatic Forcing</h1>
-<p><code>src/paramerizations/vertical/MOM_diabatic_driver.F90</code></p>
+<p><code>MOM_diabatic_driver.F90</code></p>
 <p>Many parameterizations are applied via <code>diabatic()</code></p>
 <ul>
 <li>KPP (vertical) mixing</li>
@@ -944,12 +944,23 @@ end module MOM_geothermal
 
 <section id="tracers" class="title-slide slide level1">
 <h1>Tracers</h1>
+<p><code>MOM_tracer_{advect,hor_diff}.F90</code></p>
 <ul>
-<li>advect_tracer</li>
-<li>tracer_hordiff</li>
-<li>update_segment_tracer_reservoirs</li>
-<li>step_forward_meke</li>
+<li><p><code>advect_tracer()</code></p>
+<ul>
+<li><code>advect_x()</code></li>
+<li><code>advect_y()</code></li>
+</ul></li>
+<li><p><code>tracer_hordiff()</code></p>
+<ul>
+<li><code>neutral_diffusion()</code></li>
+</ul></li>
+<li><p><code>tracer_vertdiff()</code> (diabatic)</p></li>
 </ul>
+<p>Certain tracers are implemented in-code (age, CFC, etc)</p>
+<aside class="notes">
+<p>OBC corrections are prevalent here</p>
+</aside>
 </section>
 
 <section id="metric-grids" class="title-slide slide level1">
@@ -1178,19 +1189,22 @@ call cpu_clock_end(id_clock_ocean)</code></pre>
 <p>Results printed to stdout at end of run</p>
 </section>
 
-<section id="other-topics" class="title-slide slide level1">
-<h1>Other Topics</h1>
-<ul>
-<li><p>Restart field management (<code>register_restart_field()</code>)</p></li>
-<li><p>Vertical regridding (<code>MOM_ALE.F90</code>)</p></li>
-<li><p>Interacting with coupler</p>
-<ul>
-<li><code>forces</code>, <code>fluxes</code>, etc</li>
-<li>Time interpolation</li>
-</ul></li>
-<li><p><code>data_override()</code></p></li>
-</ul>
+<section>
+<section id="exercise" class="title-slide slide level1">
+<h1>Exercise</h1>
+<p>Create a new diagnostic and generate the output.</p>
+<p>An simple example is enstrophy density, <span class="math inline">\(\tfrac{1}{2} \left| \nabla \times \mathbf{u} \right|^2\)</span>, i.e. square of vorticity. You could also use its potential vorticity equivalent.</p>
+<p>You are welcome to create your own diagnostic!</p>
 </section>
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<ol type="1">
+<li>Register with <code>register_diag_field()</code>, save id</li>
+<li>Compute the field</li>
+<li>Pass id and field to <code>post_data()</code></li>
+<li>Enable the diagnostic in <code>diag_table</code></li>
+</ol>
+</section></section>
     </div>
   </div>
 
