@@ -151,7 +151,7 @@ Write a meaningful message:
 
 
 Commits as email
-----------------
+================
 
 * Pre-git, commits were *emails* sent to maintainers
 
@@ -245,9 +245,7 @@ GitHub Actions run the internal test suite
    $ make -j
    $ make -j test
 
-
-Resolving the CI
-----------------
+Results:
 
 1. ``dev/gfdl`` was out of date (missing MacOS fix)
 
@@ -257,20 +255,34 @@ Resolving the CI
 Gaea Regression
 ===============
 
-"Extra" step
+.. image:: img/mom_validate.svg
 
 
 Final Approval
 ==============
 
+If all of the tests pass, then a human being gets involved and evaluates the
+contribution.
 
-Fast-Forward?
--------------
+Three options:
 
-Explain FF
+* Merge
+* Rebase
+* Squash
 
 
-Epilogue: Merge to Main
-=======================
+GitHub Merge
+============
 
-Show the process
+GitHub merges are "non-fast-forward".   They create a *merge commit*.
+
+.. image:: img/git_ff.png
+   :width: 50%
+
+This preserves the history of the original branch.
+
+
+Epilogue: Merge to ``main``
+===========================
+
+TODO

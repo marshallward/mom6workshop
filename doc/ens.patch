@@ -1,0 +1,52 @@
+diff --git a/src/core/MOM_CoriolisAdv.F90 b/src/core/MOM_CoriolisAdv.F90
+index 154db3eaa..00606a3d8 100644
+--- a/src/core/MOM_CoriolisAdv.F90
++++ b/src/core/MOM_CoriolisAdv.F90
+@@ -78,6 +78,7 @@ type, public :: CoriolisAdv_CS ; private
+   !>@{ Diagnostic IDs
+   integer :: id_rv = -1, id_PV = -1, id_gKEu = -1, id_gKEv = -1
+   integer :: id_rvxu = -1, id_rvxv = -1
++  integer :: id_ens = -1
+   ! integer :: id_hf_gKEu    = -1, id_hf_gKEv    = -1
+   integer :: id_hf_gKEu_2d = -1, id_hf_gKEv_2d = -1
+   integer :: id_intz_gKEu_2d = -1, id_intz_gKEv_2d = -1
+@@ -188,6 +189,8 @@ subroutine CorAdCalc(u, v, h, uh, vh, CAu, CAv, OBC, AD, G, GV, US, CS, pbv, Wav
+   real, dimension(SZIB_(G),SZJB_(G),SZK_(GV)) :: &
+     PV, &       ! A diagnostic array of the potential vorticities [H-1 T-1 ~> m-1 s-1 or m2 kg-1 s-1].
+     RV          ! A diagnostic array of the relative vorticities [T-1 ~> s-1].
++  real, dimension(SZIB_(G),SZJB_(G),SZK_(GV)) :: &
++    Ens         ! A diagnostic array of the enstrophy density [T-2 ~> s-2]
+   real, dimension(SZIB_(G),SZJ_(G),SZK_(G)) ::     CAuS !
+   real, dimension(SZI_(G),SZJB_(G),SZK_(G)) ::     CAvS !
+   real :: fv1, fv2, fv3, fv4   ! (f+rv)*v [L T-2 ~> m s-2].
+@@ -503,6 +506,12 @@ subroutine CorAdCalc(u, v, h, uh, vh, CAu, CAv, OBC, AD, G, GV, US, CS, pbv, Wav
+       enddo ; enddo
+     endif
+ 
++    if (CS%id_ens > 0) then
++      do J=Jsq-1,Jeq+1 ; do I=Isq-1,Ieq+1
++        Ens(I,J,k) = rel_vort(I,J)**2
++      enddo ; enddo
++    endif
++
+     if (CS%id_PV > 0) then
+       do J=Jsq-1,Jeq+1 ; do I=Isq-1,Ieq+1
+         PV(I,J,k) = q(I,J)
+@@ -925,6 +934,7 @@ subroutine CorAdCalc(u, v, h, uh, vh, CAu, CAv, OBC, AD, G, GV, US, CS, pbv, Wav
+   ! Here the various Coriolis-related derived quantities are offered for averaging.
+   if (query_averaging_enabled(CS%diag)) then
+     if (CS%id_rv > 0) call post_data(CS%id_rv, RV, CS%diag)
++    if (CS%id_ens > 0) call post_data(CS%id_ens, Ens, CS%diag)
+     if (CS%id_PV > 0) call post_data(CS%id_PV, PV, CS%diag)
+     if (CS%id_gKEu>0) call post_data(CS%id_gKEu, AD%gradKEu, CS%diag)
+     if (CS%id_gKEv>0) call post_data(CS%id_gKEv, AD%gradKEv, CS%diag)
+@@ -1195,6 +1205,9 @@ subroutine CoriolisAdv_init(Time, G, GV, US, param_file, diag, AD, CS)
+   CS%id_rv = register_diag_field('ocean_model', 'RV', diag%axesBL, Time, &
+      'Relative Vorticity', 's-1', conversion=US%s_to_T)
+ 
++  CS%id_ens = register_diag_field('ocean_model', 'Ens', diag%axesBL, Time, &
++     'Enstrophy Density', 's-2', conversion=US%s_to_T**2)
++
+   CS%id_PV = register_diag_field('ocean_model', 'PV', diag%axesBL, Time, &
+      'Potential Vorticity', 'm-1 s-1', conversion=GV%m_to_H*US%s_to_T)
+ 

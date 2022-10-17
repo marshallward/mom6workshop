@@ -67,7 +67,6 @@
 
 <p>Presentation is available at</p>
 <p><a href="https://marshallward.org/mom6workshop/internals.html">https://marshallward.org/mom6workshop/internals.html</a></p>
-<p>Goal: Begin reading and navigating the codebase</p>
 </section>
 <section id="mom6-directory-tree" class="title-slide slide level1">
 <h1>MOM6 directory tree</h1>
@@ -138,6 +137,25 @@
 <p>New models probably need to develop their own drivers.</p>
 </section>
 
+<section id="a-minimal-driver" class="title-slide slide level1">
+<h1>A Minimal Driver</h1>
+<pre class="fortran"><code>call initialize_MOM(MOM_CS)
+call finish_MOM_initialization(MOM_CS)
+
+do while (time &lt; time_end)
+  ! update fluxes
+  ! update time
+
+  do n = 1, n_steps
+    call step_MOM(fluxes, MOM_CS)
+  enddo
+enddo
+
+call MOM_end()</code></pre>
+<p>(Very schematic, not a real program!)</p>
+<p>MOM steps are mostly oblivious to driver structure</p>
+</section>
+
 <section id="other-configs" class="title-slide slide level1">
 <h1>Other configs</h1>
 <dl>
@@ -151,7 +169,6 @@
 <dd><p>BGC, Data assimilation, Python interface, etc.</p>
 </dd>
 </dl>
-<p>Ideal for interfacing with other technology</p>
 </section>
 
 <section id="src" class="title-slide slide level1">
@@ -809,12 +826,22 @@ end module MOM_geothermal
 </code></pre>
 <ul>
 <li>One module per file</li>
-<li>Modules communicate by <strong>control structures</strong></li>
-<li>No internal module variables (i.e. no "state")</li>
+<li>Modules communicate by <strong>control structures</strong> (CS)</li>
 </ul>
 <aside class="notes">
 <p>One consequence of having no state is that functions have many, many arguments. An object-oriented approach could help reduce this.</p>
 </aside>
+</section>
+
+<section id="module-design" class="title-slide slide level1">
+<h1>Module design</h1>
+<ul>
+<li>CS are <em>private</em>: contents hidden from other modules</li>
+<li>Interface is <em>public</em>, dependencies are <em>explicit</em></li>
+<li>No internal module variables (i.e. no "state")</li>
+<li>Contents are <em>documented</em> (including units!)</li>
+</ul>
+<p>Module functions can modify external fields, but other modules cannot see inside the CS</p>
 </section>
 
 <section id="main-loop" class="title-slide slide level1">
@@ -869,7 +896,7 @@ end module MOM_geothermal
 <td><code>step_MOM_dyn_split_RK2()</code></td>
 </tr>
 <tr class="even">
-<td>ML restratification</td>
+<td>Submesoscale</td>
 <td><code>mixedlayer_restrat()</code></td>
 </tr>
 <tr class="odd">
@@ -907,7 +934,7 @@ end module MOM_geothermal
 <td><code>vertvisc()</code></td>
 </tr>
 <tr class="even">
-<td>Barotropic steps</td>
+<td>Barotropic</td>
 <td><code>btstep()</code></td>
 </tr>
 <tr class="odd">
@@ -961,6 +988,28 @@ end module MOM_geothermal
 <aside class="notes">
 <p>OBC corrections are prevalent here</p>
 </aside>
+</section>
+
+<section id="pkg" class="title-slide slide level1">
+<h1><code>pkg/</code></h1>
+<table>
+<tbody>
+<tr class="odd">
+<td><code>CVMix-src/</code></td>
+<td>Convective mixing</td>
+</tr>
+<tr class="even">
+<td><code>GSW-Fortran/</code></td>
+<td>Equation of state (TEOS)</td>
+</tr>
+</tbody>
+</table>
+<p>Code "hidden" in submodules, inserted with symbolic links</p>
+</section>
+
+<section id="mom6-idioms" class="title-slide slide level1">
+<h1>MOM6 Idioms</h1>
+
 </section>
 
 <section id="metric-grids" class="title-slide slide level1">
@@ -1059,8 +1108,7 @@ enddo</code></pre></td>
 
 <section id="index-macros" class="title-slide slide level1">
 <h1>Index Macros</h1>
-<p>Static memory is supported with macros</p>
-<p><code>#include &lt;MOM_memory.h&gt;</code></p>
+<p>Generalized indices with <code>#include &lt;MOM_memory.h&gt;</code></p>
 <table>
 <thead>
 <tr class="header">
@@ -1087,7 +1135,8 @@ enddo</code></pre></td>
 </tr>
 </tbody>
 </table>
-<p>Use <code>ALLOCABLE_()</code> to allocate</p>
+<p>These ensure that edge-indices are zero-indexed</p>
+<p>(Also see <code>ALLOC_()</code>, <code>DEALLOC_()</code>, <code>ALLOCABLE_</code>)</p>
 </section>
 
 <section id="parallelization" class="title-slide slide level1">
@@ -1113,6 +1162,7 @@ enddo</code></pre></td>
 <dd><p>Wait until a halo update has completed</p>
 </dd>
 </dl>
+<p>(<a href="https://mom6.readthedocs.io/en/main/api/generated/modules/mom_checksums.html#f/mom_checksums">MOM_checksums</a> API)</p>
 </section>
 
 <section id="example-halo-update" class="title-slide slide level1">
@@ -1145,18 +1195,19 @@ endif</code></pre>
    conversion=(US%L_to_m**2)*US%s_to_T)</code></pre>
 <p><code>post_data()</code></p>
 <pre class="fortran"><code>if (CS%id_Kh_h &gt; 0) call post_data(CS%id_Kh_h, Kh_h, CS%diag)</code></pre>
+<p>(<a href="https://mom6.readthedocs.io/en/main/api/generated/modules/mom_diag_mediator.html#f/mom_diag_mediator">MOM_diag_mediator</a> API)</p>
 </section>
 
 <section id="input-parameters" class="title-slide slide level1">
 <h1>Input Parameters</h1>
 <p>Define <code>MOM_input</code> parameters with <code>get_param()</code>:</p>
 <pre class="fortran"><code>call get_param(param_file, mdl, &quot;KH&quot;, Kh, &amp;
-               &quot;The background Laplacian horizontal viscosity&quot;, &amp;
-               units=&quot;m2 s-1&quot;, &amp;
-               default=0.0, &amp;
-               scale=(US%m_to_L**2)*US%T_to_s, &amp;
-               do_not_log=.not.CS%Laplacian &amp;
-)</code></pre>
+    &quot;The background Laplacian horizontal viscosity&quot;, &amp;
+    units=&quot;m2 s-1&quot;, &amp;
+    default=0.0, &amp;
+    scale=(US%m_to_L**2)*US%T_to_s, &amp;
+    do_not_log=.not.CS%Laplacian)</code></pre>
+<p>(<a href="https://mom6.readthedocs.io/en/main/api/generated/modules/mom_file_parser.html#f/mom_file_parser">MOM_file_input</a> API)</p>
 </section>
 
 <section id="checksums" class="title-slide slide level1">
@@ -1170,6 +1221,7 @@ call uvchksum(&quot;Kh_[uv]&quot;, Kh_u, Kh_v, G%HI, &amp;
 ! Cell vertex
 call Bchksum(Kh_q, &quot;Kh_q&quot;, G%HI, scale=(US%L_to_m**2)*US%s_to_T)</code></pre>
 <p>See "MOM6 development" for more info</p>
+<p>(<a href="https://mom6.readthedocs.io/en/main/api/generated/modules/mom_checksums.html#f/mom_checksums">MOM_checksums</a> API)</p>
 </section>
 
 <section id="timers" class="title-slide slide level1">

@@ -15,8 +15,6 @@ Presentation is available at
 
 https://marshallward.org/mom6workshop/internals.html
 
-Goal: Begin reading and navigating the codebase
-
 
 MOM6 directory tree
 ===================
@@ -48,6 +46,30 @@ Directory               Driver
 New models probably need to develop their own drivers.
 
 
+A Minimal Driver
+================
+
+.. code:: fortran
+
+   call initialize_MOM(MOM_CS)
+   call finish_MOM_initialization(MOM_CS)
+
+   do while (time < time_end)
+     ! update fluxes
+     ! update time
+
+     do n = 1, n_steps
+       call step_MOM(fluxes, MOM_CS)
+     enddo
+   enddo
+
+   call MOM_end()
+
+(Very schematic, not a real program!)
+
+MOM steps are mostly oblivious to driver structure
+
+
 Other configs
 =============
 
@@ -59,8 +81,6 @@ Other configs
 
 ``config_src/external``
    BGC, Data assimilation, Python interface, etc.
-
-Ideal for interfacing with other technology
 
 .. TODO example?  cheng's builds?
 
@@ -89,13 +109,28 @@ Module Format
    :code: fortran
 
 * One module per file
-* Modules communicate by **control structures**
-* No internal module variables (i.e. no "state")
+
+* Modules communicate by **control structures** (CS)
 
 .. notes::
 
    One consequence of having no state is that functions have many, many
    arguments.  An object-oriented approach could help reduce this.
+
+
+Module design
+=============
+
+* CS are *private*: contents hidden from other modules
+
+* Interface is *public*, dependencies are *explicit*
+
+* No internal module variables (i.e. no "state")
+
+* Contents are *documented* (including units!)
+
+Module functions can modify external fields, but other modules cannot see
+inside the CS
 
 
 Main Loop
@@ -125,7 +160,7 @@ Process              Subroutine
 GM diffusion         ``thickness_diffuse()``
 Bottom drag          ``set_viscous_BBL()``
 Flow transport       ``step_MOM_dyn_split_RK2()``
-ML restratification  ``mixedlayer_restrat()``
+Submesoscale         ``mixedlayer_restrat()``
 Mesoscale eddies     ``step_forward_MEKE()``
 ===================  ============================
 
@@ -145,7 +180,7 @@ Process                                Subroutine
 :math:`f \hat{z} \times \mathbf{u}`    ``CorAdCalc()``
 :math:`-\nabla p`                      ``PressureForce()``
 Vertical Viscosity                     ``vertvisc()``
-Barotropic steps                       ``btstep()``
+Barotropic                             ``btstep()``
 Mass/Volume Balance                    ``continuity()``
 Horizontal viscosity                   ``horizontal_viscosity()``
 ===================================    ==========================
@@ -198,6 +233,21 @@ Certain tracers are implemented in-code (age, CFC, etc)
 .. notes::
 
    OBC corrections are prevalent here
+
+
+``pkg/``
+========
+
+================  ========================
+``CVMix-src/``    Convective mixing
+``GSW-Fortran/``  Equation of state (TEOS)
+================  ========================
+
+Code "hidden" in submodules, inserted with symbolic links
+
+
+MOM6 Idioms
+===========
 
 
 Metric Grids
@@ -282,9 +332,7 @@ Memory Layout
 Index Macros
 ============
 
-Static memory is supported with macros
-
-``#include <MOM_memory.h>``
+Generalized indices with ``#include <MOM_memory.h>``
 
 ==========  ==================================
 Field       Declaration
@@ -295,7 +343,9 @@ North Face  ``v(SZI_(G), SZJB_(G), SZK_(G))``
 Vertex      ``q(SZIB_(G), SZJB_(G), SZK_(G))``
 ==========  ==================================
 
-Use ``ALLOCABLE_()`` to allocate
+These ensure that edge-indices are zero-indexed
+
+(Also see ``ALLOC_()``, ``DEALLOC_()``, ``ALLOCABLE_``)
 
 
 Parallelization
@@ -322,6 +372,11 @@ Message Passing
 
 ``complete_group_pass(group, domain)``
    Wait until a halo update has completed
+
+(`MOM_checksums`_ API)
+
+.. _MOM_checksums:
+   https://mom6.readthedocs.io/en/main/api/generated/modules/mom_coms.html#f/mom_coms
 
 
 Example halo update
@@ -372,6 +427,11 @@ Diagnostics
 
    if (CS%id_Kh_h > 0) call post_data(CS%id_Kh_h, Kh_h, CS%diag)
 
+(`MOM_diag_mediator`_ API)
+
+.. _MOM_diag_mediator:
+   https://mom6.readthedocs.io/en/main/api/generated/modules/mom_diag_mediator.html#f/mom_diag_mediator
+
 
 Input Parameters
 ================
@@ -381,12 +441,16 @@ Define ``MOM_input`` parameters with ``get_param()``:
 .. code:: fortran
 
    call get_param(param_file, mdl, "KH", Kh, &
-                  "The background Laplacian horizontal viscosity", &
-                  units="m2 s-1", &
-                  default=0.0, &
-                  scale=(US%m_to_L**2)*US%T_to_s, &
-                  do_not_log=.not.CS%Laplacian &
-   )
+       "The background Laplacian horizontal viscosity", &
+       units="m2 s-1", &
+       default=0.0, &
+       scale=(US%m_to_L**2)*US%T_to_s, &
+       do_not_log=.not.CS%Laplacian)
+
+(`MOM_file_input`_ API)
+
+.. _MOM_file_input:
+   https://mom6.readthedocs.io/en/main/api/generated/modules/mom_file_parser.html#f/mom_file_parser
 
 
 Checksums
@@ -405,6 +469,11 @@ Verify the reproducibility of fields:
    call Bchksum(Kh_q, "Kh_q", G%HI, scale=(US%L_to_m**2)*US%s_to_T)
 
 See "MOM6 development" for more info
+
+(`MOM_checksums`_ API)
+
+.. _MOM_checksums:
+   https://mom6.readthedocs.io/en/main/api/generated/modules/mom_checksums.html#f/mom_checksums
 
 
 Timers

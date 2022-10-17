@@ -209,7 +209,6 @@ no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&q
 <pre><code>$ git add src/core/MOM_CoriolisAdv.F90</code></pre>
 </section>
 
-<section>
 <section id="commit-changes" class="title-slide slide level1">
 <h1>Commit Changes</h1>
 <p>Commit the file:</p>
@@ -219,8 +218,10 @@ no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&q
 <p>Write a meaningful message:</p>
 <p><img data-src="img/commit_log.png" alt="image" /></p>
 </section>
-<section id="commits-as-email" class="slide level2">
-<h2>Commits as email</h2>
+
+<section>
+<section id="commits-as-email" class="title-slide slide level1">
+<h1>Commits as email</h1>
 <ul>
 <li><p>Pre-git, commits were <em>emails</em> sent to maintainers</p>
 <ul>
@@ -282,7 +283,6 @@ $ git push --force marshall my_feature    # Rewrite history</code></pre>
 <p>This one had problems!</p>
 </section>
 
-<section>
 <section id="testing" class="title-slide slide level1">
 <h1><code>.testing</code></h1>
 <p>GitHub Actions run the internal test suite</p>
@@ -290,31 +290,39 @@ $ git push --force marshall my_feature    # Rewrite history</code></pre>
 $ cd .testing
 $ make -j
 $ make -j test</code></pre>
-</section>
-<section id="resolving-the-ci" class="slide level2">
-<h2>Resolving the CI</h2>
+<p>Results:</p>
 <ol type="1">
 <li><code>dev/gfdl</code> was out of date (missing MacOS fix)</li>
 <li>New diagnostic was missing from OpenMP directives</li>
 </ol>
-</section></section>
+</section>
+
 <section id="gaea-regression" class="title-slide slide level1">
 <h1>Gaea Regression</h1>
-<p>"Extra" step</p>
+<p><img data-src="img/mom_validate.svg" alt="image" /></p>
 </section>
 
-<section>
 <section id="final-approval" class="title-slide slide level1">
 <h1>Final Approval</h1>
-
+<p>If all of the tests pass, then a human being gets involved and evaluates the contribution.</p>
+<p>Three options:</p>
+<ul>
+<li>Merge</li>
+<li>Rebase</li>
+<li>Squash</li>
+</ul>
 </section>
-<section id="fast-forward" class="slide level2">
-<h2>Fast-Forward?</h2>
-<p>Explain FF</p>
-</section></section>
+
+<section id="github-merge" class="title-slide slide level1">
+<h1>GitHub Merge</h1>
+<p>GitHub merges are "non-fast-forward". They create a <em>merge commit</em>.</p>
+<p><img data-src="img/git_ff.png" style="width:50.0%" alt="image" /></p>
+<p>This preserves the history of the original branch.</p>
+</section>
+
 <section id="epilogue-merge-to-main" class="title-slide slide level1">
-<h1>Epilogue: Merge to Main</h1>
-<p>Show the process</p>
+<h1>Epilogue: Merge to <code>main</code></h1>
+<p>TODO</p>
 </section>
     </div>
   </div>
