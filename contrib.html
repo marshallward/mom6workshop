@@ -70,17 +70,15 @@
 </section>
 <section id="the-mom6-repository" class="title-slide slide level1">
 <h1>The MOM6 Repository</h1>
-<p>TODO: Snapshot of website</p>
-<p><a href="https://github.com/NOAA-GFDL/MOM6.git">https://github.com/NOAA-GFDL/MOM6.git</a></p>
+<p><a href="https://github.com/NOAA-GFDL/MOM6.git"><img data-src="img/mom6repo.png" alt="image" /></a></p>
 <p>MOM6-examples pulls from this repository.</p>
 </section>
 
-<section id="the-mom6-community" class="title-slide slide level1">
-<h1>The MOM6 Community</h1>
-<p><img data-src="img/consortium.svg" style="width:80.0%" alt="image" /></p>
+<section id="the-mom6-consortium" class="title-slide slide level1">
+<h1>The MOM6 Consortium</h1>
+<p><a href="https://github.com/mom-ocean/MOM6.git"><img data-src="img/consortium.svg" style="width:80.0%" alt="image" /></a></p>
 </section>
 
-<section>
 <section id="cloning" class="title-slide slide level1">
 <h1>Cloning</h1>
 <p>Get the repository:</p>
@@ -95,8 +93,9 @@ origin   https://github.com/NOAA-GFDL/MOM6.git (push)</code></pre>
 </dd>
 </dl>
 </section>
-<section id="solution" class="slide level2">
-<h2>Solution</h2>
+
+<section id="solution" class="title-slide slide level1">
+<h1>Solution</h1>
 <ol type="1">
 <li><p>Log into GitHub, go to MOM6:</p>
 <p><a href="https://github.com/NOAA-GFDL/MOM6.git">https://github.com/NOAA-GFDL/MOM6.git</a></p></li>
@@ -107,7 +106,8 @@ origin   https://github.com/NOAA-GFDL/MOM6.git (push)</code></pre>
 <li><p>Sync to the remote:</p>
 <pre><code>$ git push marshall dev/gfdl</code></pre></li>
 </ol>
-</section></section>
+</section>
+
 <section id="branching" class="title-slide slide level1">
 <h1>Branching</h1>
 <p>You want to start a new project! Create a new <em>branch</em>:</p>
@@ -118,20 +118,122 @@ $ git checkout my_feature     # Switch to new branch</code></pre>
 <p>Changes to <code>my_feature</code> will not alter <code>dev/gfdl</code>.</p>
 </section>
 
+<section>
 <section id="changing-the-code" class="title-slide slide level1">
 <h1>Changing the Code</h1>
-<p>Some superficial example</p>
+<p>Add a welcome message:</p>
+<pre class="diff"><code>diff --git a/src/core/MOM.F90 b/src/core/MOM.F90
+index 267a162b0..17d5259c8 100644
+--- a/src/core/MOM.F90
++++ b/src/core/MOM.F90
+@@ -1912,6 +1912,8 @@ subroutine initialize_MOM(Time, Time_init, param_file, dirs, CS, restart_CSp, &amp;
+
+   CS%Time =&gt; Time
+
++  print *, &quot;Welcome to MOM6!&quot;
++
+   id_clock_init = cpu_clock_id(&#39;Ocean Initialization&#39;, grain=CLOCK_SUBCOMPONENT)
+   call cpu_clock_begin(id_clock_init)</code></pre>
+<p>Or use your patch from "MOM6 internals"</p>
+</section>
+<section id="diagnostic-patch" class="slide level2">
+<h2>Diagnostic patch</h2>
+<pre class="diff" data-code="diff
+
+"><code>diff --git a/src/core/MOM_CoriolisAdv.F90 b/src/core/MOM_CoriolisAdv.F90
+index 154db3eaa..00606a3d8 100644
+--- a/src/core/MOM_CoriolisAdv.F90
++++ b/src/core/MOM_CoriolisAdv.F90
+@@ -78,6 +78,7 @@ type, public :: CoriolisAdv_CS ; private
+   !&gt;@{ Diagnostic IDs
+   integer :: id_rv = -1, id_PV = -1, id_gKEu = -1, id_gKEv = -1
+   integer :: id_rvxu = -1, id_rvxv = -1
++  integer :: id_ens = -1
+   ! integer :: id_hf_gKEu    = -1, id_hf_gKEv    = -1
+   integer :: id_hf_gKEu_2d = -1, id_hf_gKEv_2d = -1
+   integer :: id_intz_gKEu_2d = -1, id_intz_gKEv_2d = -1
+@@ -188,6 +189,8 @@ subroutine CorAdCalc(u, v, h, uh, vh, CAu, CAv, OBC, AD, G, GV, US, CS, pbv, Wav
+   real, dimension(SZIB_(G),SZJB_(G),SZK_(GV)) :: &amp;
+     PV, &amp;       ! A diagnostic array of the potential vorticities [H-1 T-1 ~&gt; m-1 s-1 or m2 kg-1 s-1].
+     RV          ! A diagnostic array of the relative vorticities [T-1 ~&gt; s-1].
++  real, dimension(SZIB_(G),SZJB_(G),SZK_(GV)) :: &amp;
++    Ens         ! A diagnostic array of the enstrophy density [T-2 ~&gt; s-2]
+   real, dimension(SZIB_(G),SZJ_(G),SZK_(G)) ::     CAuS !
+   real, dimension(SZI_(G),SZJB_(G),SZK_(G)) ::     CAvS !
+   real :: fv1, fv2, fv3, fv4   ! (f+rv)*v [L T-2 ~&gt; m s-2].
+@@ -503,6 +506,12 @@ subroutine CorAdCalc(u, v, h, uh, vh, CAu, CAv, OBC, AD, G, GV, US, CS, pbv, Wav
+       enddo ; enddo
+     endif
+ 
++    if (CS%id_ens &gt; 0) then
++      do J=Jsq-1,Jeq+1 ; do I=Isq-1,Ieq+1
++        Ens(I,J,k) = rel_vort(I,J)**2
++      enddo ; enddo
++    endif
++
+     if (CS%id_PV &gt; 0) then
+       do J=Jsq-1,Jeq+1 ; do I=Isq-1,Ieq+1
+         PV(I,J,k) = q(I,J)
+@@ -925,6 +934,7 @@ subroutine CorAdCalc(u, v, h, uh, vh, CAu, CAv, OBC, AD, G, GV, US, CS, pbv, Wav
+   ! Here the various Coriolis-related derived quantities are offered for averaging.
+   if (query_averaging_enabled(CS%diag)) then
+     if (CS%id_rv &gt; 0) call post_data(CS%id_rv, RV, CS%diag)
++    if (CS%id_ens &gt; 0) call post_data(CS%id_ens, Ens, CS%diag)
+     if (CS%id_PV &gt; 0) call post_data(CS%id_PV, PV, CS%diag)
+     if (CS%id_gKEu&gt;0) call post_data(CS%id_gKEu, AD%gradKEu, CS%diag)
+     if (CS%id_gKEv&gt;0) call post_data(CS%id_gKEv, AD%gradKEv, CS%diag)
+@@ -1195,6 +1205,9 @@ subroutine CoriolisAdv_init(Time, G, GV, US, param_file, diag, AD, CS)
+   CS%id_rv = register_diag_field(&#39;ocean_model&#39;, &#39;RV&#39;, diag%axesBL, Time, &amp;
+      &#39;Relative Vorticity&#39;, &#39;s-1&#39;, conversion=US%s_to_T)
+ 
++  CS%id_ens = register_diag_field(&#39;ocean_model&#39;, &#39;Ens&#39;, diag%axesBL, Time, &amp;
++     &#39;Enstrophy Density&#39;, &#39;s-2&#39;, conversion=US%s_to_T**2)
++
+   CS%id_PV = register_diag_field(&#39;ocean_model&#39;, &#39;PV&#39;, diag%axesBL, Time, &amp;
+      &#39;Potential Vorticity&#39;, &#39;m-1 s-1&#39;, conversion=GV%m_to_H*US%s_to_T)
+ 
+</code></pre>
+</section></section>
+<section id="verify-changes" class="title-slide slide level1">
+<h1>Verify Changes</h1>
+<p>Check status:</p>
+<pre><code>$ git status
+HEAD detached at 5201c34a3
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+ modified:   src/core/MOM_CoriolisAdv.F90
+
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)</code></pre>
+<p>Add file:</p>
+<pre><code>$ git add src/core/MOM_CoriolisAdv.F90</code></pre>
 </section>
 
 <section>
-<section id="commiting-changes" class="title-slide slide level1">
-<h1>Commiting Changes</h1>
+<section id="commit-changes" class="title-slide slide level1">
+<h1>Commit Changes</h1>
+<p>Commit the file:</p>
+<pre><code>$ git commit
+[my_feature 02244bd3b] Enstrophy density diagnostic
+1 file changed, 13 insertions(+)</code></pre>
+<p>Write a meaningful message:</p>
+<p><img data-src="img/commit_log.png" alt="image" /></p>
+</section>
+<section id="commits-as-email" class="slide level2">
+<h2>Commits as email</h2>
 <ul>
-<li>git status</li>
-<li>git add ...</li>
-<li>git commit</li>
-<li>commit formatting</li>
+<li><p>Pre-git, commits were <em>emails</em> sent to maintainers</p>
+<ul>
+<li>The patch was the commit</li>
+<li>The log was the email (subject + body)</li>
+</ul></li>
+<li><p>Emails follow a standard format (RFC 5822)</p>
+<ul>
+<li>"Lines … SHOULD be limited to 78 characters"</li>
+<li>Subject reduced to ~50, leave space for hash</li>
+</ul></li>
 </ul>
+<p>The closer you follow these rules, the better the results</p>
 </section>
 <section class="slide level2">
 
@@ -144,12 +246,12 @@ $ git checkout my_feature     # Switch to new branch</code></pre>
 </section></section>
 <section id="preparing-the-pull-request" class="title-slide slide level1">
 <h1>Preparing the Pull Request</h1>
-<p>GitHub handles <strong>pull requests</strong> (PRs) between repositories.</p>
-<p>The PR <em>moves</em> commits between repositories.</p>
+<p>GitHub handles <em>pull requests</em> (PRs) between repositories.</p>
 <pre class="sh"><code>$ git fetch origin dev/gfdl      # Update the target branch
 $ git checkout my_feature        # switch to feature
 $ git rebase -i dev/gfdl         # sync commits
 $ git push marshall my_feature   # Push to personal repo</code></pre>
+<p>The PR moves commits between repositories.</p>
 </section>
 
 <section id="minor-edits" class="title-slide slide level1">
@@ -168,40 +270,51 @@ $ git push --force marshall my_feature    # Rewrite history</code></pre>
 <p>No one cares about typos! Don't put them in the history</p>
 </section>
 
-<section>
 <section id="submit-to-mom6" class="title-slide slide level1">
 <h1>Submit to MOM6</h1>
-<p>TODO</p>
-</section>
-<section id="fast-forward" class="slide level2">
-<h2>Fast-Forward?</h2>
-<p>Explain FF</p>
-</section></section>
-<section id="ci-testing" class="title-slide slide level1">
-<h1>CI Testing</h1>
-<p>"Continuous Integration"</p>
-<p>Briefly describe test suite</p>
+<p><img data-src="img/new_pr.png" alt="image" /></p>
 </section>
 
+<section id="ci-testing" class="title-slide slide level1">
+<h1>CI Testing</h1>
+<p>Continuous Integration checks all pull requests:</p>
+<p><img data-src="img/failed_tests.png" alt="image" /></p>
+<p>This one had problems!</p>
+</section>
+
+<section>
+<section id="testing" class="title-slide slide level1">
+<h1><code>.testing</code></h1>
+<p>GitHub Actions run the internal test suite</p>
+<pre class=""><code>$ cd MOM6-examples/src/MOM6
+$ cd .testing
+$ make -j
+$ make -j test</code></pre>
+</section>
+<section id="resolving-the-ci" class="slide level2">
+<h2>Resolving the CI</h2>
+<ol type="1">
+<li><code>dev/gfdl</code> was out of date (missing MacOS fix)</li>
+<li>New diagnostic was missing from OpenMP directives</li>
+</ol>
+</section></section>
 <section id="gaea-regression" class="title-slide slide level1">
 <h1>Gaea Regression</h1>
 <p>"Extra" step</p>
 </section>
 
+<section>
 <section id="final-approval" class="title-slide slide level1">
 <h1>Final Approval</h1>
 
 </section>
-
+<section id="fast-forward" class="slide level2">
+<h2>Fast-Forward?</h2>
+<p>Explain FF</p>
+</section></section>
 <section id="epilogue-merge-to-main" class="title-slide slide level1">
 <h1>Epilogue: Merge to Main</h1>
 <p>Show the process</p>
-</section>
-
-<section id="exercise" class="title-slide slide level1">
-<h1>Exercise</h1>
-<p>Add a diagnostic? Doesn't really matter...</p>
-<p>Hold hands here, make it simple...</p>
 </section>
     </div>
   </div>

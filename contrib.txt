@@ -19,17 +19,17 @@ https://marshallward.org/mom6workshop/contrib.html
 The MOM6 Repository
 ===================
 
-TODO: Snapshot of website
-
-https://github.com/NOAA-GFDL/MOM6.git
+.. image:: img/mom6repo.png
+   :target: https://github.com/NOAA-GFDL/MOM6.git
 
 MOM6-examples pulls from this repository.
 
 
-The MOM6 Community
-==================
+The MOM6 Consortium
+===================
 
 .. image:: img/consortium.svg
+   :target: https://github.com/mom-ocean/MOM6.git
    :width: 80%
 
 
@@ -53,7 +53,7 @@ Exercise:
 
 
 Solution
---------
+========
 
 1. Log into GitHub, go to MOM6:
 
@@ -90,16 +90,83 @@ Changes to ``my_feature`` will not alter ``dev/gfdl``.
 Changing the Code
 =================
 
-Some superficial example
+Add a welcome message:
+
+.. code:: diff
+
+   diff --git a/src/core/MOM.F90 b/src/core/MOM.F90
+   index 267a162b0..17d5259c8 100644
+   --- a/src/core/MOM.F90
+   +++ b/src/core/MOM.F90
+   @@ -1912,6 +1912,8 @@ subroutine initialize_MOM(Time, Time_init, param_file, dirs, CS, restart_CSp, &
+   
+      CS%Time => Time
+   
+   +  print *, "Welcome to MOM6!"
+   +
+      id_clock_init = cpu_clock_id('Ocean Initialization', grain=CLOCK_SUBCOMPONENT)
+      call cpu_clock_begin(id_clock_init)
+
+Or use your patch from "MOM6 internals"
 
 
-Commiting Changes
-=================
+Diagnostic patch
+----------------
 
-* git status
-* git add ...
-* git commit
-* commit formatting
+.. include:: doc/ens.patch
+   :code: diff
+
+
+Verify Changes
+==============
+
+Check status::
+
+   $ git status
+   HEAD detached at 5201c34a3
+   Changes not staged for commit:
+     (use "git add <file>..." to update what will be committed)
+     (use "git restore <file>..." to discard changes in working directory)
+   	modified:   src/core/MOM_CoriolisAdv.F90
+   
+   no changes added to commit (use "git add" and/or "git commit -a")
+
+Add file::
+
+   $ git add src/core/MOM_CoriolisAdv.F90
+
+
+Commit Changes
+==============
+
+Commit the file::
+
+   $ git commit
+   [my_feature 02244bd3b] Enstrophy density diagnostic
+   1 file changed, 13 insertions(+)
+   
+Write a meaningful message:
+
+.. image:: img/commit_log.png
+
+
+Commits as email
+----------------
+
+* Pre-git, commits were *emails* sent to maintainers
+
+   * The patch was the commit
+   
+   * The log was the email (subject + body)
+
+* Emails follow a standard format (RFC 5822)
+
+   * "Lines … SHOULD be limited to 78 characters"
+   
+   * Subject reduced to ~50, leave space for hash
+
+The closer you follow these rules, the better the results
+
 
 ====
 
@@ -113,12 +180,11 @@ Linus Torvalds, Linux OSS 2020
 
    If you can explain the code change to me, I will trust the code.
 
+
 Preparing the Pull Request
 ==========================
 
-GitHub handles **pull requests** (PRs) between repositories.
-
-The PR *moves* commits between repositories.
+GitHub handles *pull requests* (PRs) between repositories.
 
 .. code:: sh
 
@@ -126,6 +192,8 @@ The PR *moves* commits between repositories.
    $ git checkout my_feature        # switch to feature
    $ git rebase -i dev/gfdl         # sync commits
    $ git push marshall my_feature   # Push to personal repo
+
+The PR moves commits between repositories.
 
 
 Minor Edits
@@ -152,21 +220,38 @@ No one cares about typos!  Don't put them in the history
 Submit to MOM6
 ==============
 
-TODO
-
-
-Fast-Forward?
--------------
-
-Explain FF
+.. image:: img/new_pr.png
 
 
 CI Testing
 ==========
 
-"Continuous Integration"
+Continuous Integration checks all pull requests:
 
-Briefly describe test suite
+.. image:: img/failed_tests.png
+
+This one had problems!
+
+
+``.testing``
+============
+
+GitHub Actions run the internal test suite
+
+.. code::
+
+   $ cd MOM6-examples/src/MOM6
+   $ cd .testing
+   $ make -j
+   $ make -j test
+
+
+Resolving the CI
+----------------
+
+1. ``dev/gfdl`` was out of date (missing MacOS fix)
+
+2. New diagnostic was missing from OpenMP directives
 
 
 Gaea Regression
@@ -179,15 +264,13 @@ Final Approval
 ==============
 
 
+Fast-Forward?
+-------------
+
+Explain FF
+
+
 Epilogue: Merge to Main
 =======================
 
 Show the process
-
-
-Exercise
-========
-
-Add a diagnostic?  Doesn't really matter...
-
-Hold hands here, make it simple...
