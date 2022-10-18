@@ -16,6 +16,153 @@ Presentation is available at
 https://marshallward.org/mom6workshop/develop.html
 
 
+CI Testing
+==========
+
+==========  =========================
+Test        Description
+==========  =========================
+Mem Layout  Symmetric vs Nonsymmetric
+OpenMP      With threads
+CPU Layout  1 vs 2 CPUs
+Rotation    90° Domain Turn
+NaN Init    Aggressive initialization
+Regression  Answer changes
+==========  =========================
+
+Also tests for documentation, MacOS support, etc
+
+
+Reproducibility
+===============
+
+Numerical results must reproduce:
+
+*Even floating point!*
+
+Verification is based on ``ocean.stats``::
+
+   Step,       Day,  Truncs,      Energy/Mass,      Maximum CFL,  Mean sea level,   Total Mass,    Frac Mass Err
+             [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
+     0,       0.000,     0, En 3.3361965169932362E-01, CFL  0.01092, SL -0.0000E+00, Mass 3.95904E+18, Me  0.00E+00
+   144,       1.000,     0, En 3.3113616621947212E-01, CFL  0.01064, SL -0.0000E+00, Mass 3.95904E+18, Me -4.25E-18
+
+Energy/Mass is machine-precision and reproducible
+
+
+Numerical "style"
+=================
+
+* No ambiguous ordering
+
+  * Bad: ``a + b + c``
+
+  * OK: ``(a + b) + c``
+
+* Avoid intrinsics
+
+   * ``sum()`` is ambiguous; what is the order?
+
+   * use ``reproducing_sum()``
+
+   * Avoid ``sin()``, ``exp()``, even ``a**b``
+
+See `my FortranCon talk`_ for more about this
+
+.. _my FortranCon talk: https://www.marshallward.org/fortrancon2021/
+
+
+Bit Repro Debugging
+===================
+
+In ``MOM_input``::
+
+   DEBUG=True
+
+This enables checksums in the output::
+
+  u-point: mean=   4.5198826930130449E-02 min=  -2.2679844164834517E-03 max=   3.6386233175123922E-01 u Beginning of step_MOM  [uv]
+  u-point: c=    320978 sw=    316992 se=    316992 nw=    316992 ne=    316992 u Beginning of step_MOM  [uv]
+  v-point: mean=   0.0000000000000000E+00 min=   0.0000000000000000E+00 max=   0.0000000000000000E+00 v Beginning of step_MOM  [uv]
+  v-point: c=         0 sw=         0 se=         0 nw=         0 ne=         0 v Beginning of step_MOM  [uv]
+  h-point: mean=   1.0000000000000000E+03 min=   2.0022236368437586E+02 max=   1.7997776363156240E+03 Beginning of step_MOM  h
+  h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h
+
+Send to stderr (expect a *lot* of output!)
+
+(See also ``DIAG_AS_CHKSUM``)
+
+
+Debug Syntax
+============
+
+``h-point:``
+   Diagnostic is on a center point
+
+``mean``, ``min``, ``max``
+   Calculated over the compute domain (no halos)
+
+``c=``
+   Bit checksum over compute domain
+
+``sw=``, ``se=``, ``nw=``, ``ne=``
+   Checksum after domain shifted into halos
+
+
+Call Tree
+=========
+
+In ``MOM_unit``::
+
+   VERBOSITY=9
+
+Produces call tree (and other info):
+
+.. include:: doc/calltree.out
+   :code:
+
+
+Dimensional Consistency
+=======================
+
+
+
+Rotational Consistency
+======================
+
+
+
+Test Suite (revisited)
+======================
+
+
+
+Exercise
+========
+
+Check out fork and compile:
+
+.. code:: fortran
+
+   cd MOM6-examples/src/MOM6
+   git fetch
+   git checkout demo-layout-issue
+   # You remember how to compile, right?
+
+Run with 1 and 4 CPUs
+
+.. code:: fortran
+
+   cd ../../ocean_only/Phillips_2layer
+   mpirun -np 1 ../../build/ocean_only/MOM6
+   cp ocean.stats ocean.stats.p1
+   mpirun -np 4 ../../build/ocean_only/MOM6
+   cp ocean.stats ocean.stats.p4
+   diff ocean.stats.p1 ocean.stats.p4
+
+Do they agree?
+
+
 Style Matters
 =============
 
@@ -82,123 +229,3 @@ Why Style?
 .. _Read the guide!: https://github.com/mom-ocean/MOM6/wiki/Code-style-guide
 
 
-Reproducibility
-===============
-
-Numerical results must reproduce:
-
-*Even floating point!*
-
-Verification is based on ``ocean.stats``::
-
-   Step,       Day,  Truncs,      Energy/Mass,      Maximum CFL,  Mean sea level,   Total Mass,    Frac Mass Err
-             [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
-     0,       0.000,     0, En 3.3361965169932362E-01, CFL  0.01092, SL -0.0000E+00, Mass 3.95904E+18, Me  0.00E+00
-   144,       1.000,     0, En 3.3113616621947212E-01, CFL  0.01064, SL -0.0000E+00, Mass 3.95904E+18, Me -4.25E-18
-
-Energy/Mass is machine-precision and reproducible
-
-
-Numerical "style"
-=================
-
-* No ambiguous ordering
-
-  * Bad: ``a + b + c``
-
-  * OK: ``(a + b) + c``
-
-* Avoid intrinsics
-
-   * ``sum()`` is ambiguous; what is the order?
-
-   * use ``reproducing_sum()``
-
-   * Avoid ``sin()``, ``exp()``, etc
-
-
-Bit Repro Debugging
-===================
-
-In ``MOM_input``::
-
-   DEBUG=True
-
-This enables checksums in the output::
-
-  u-point: mean=   4.5198826930130449E-02 min=  -2.2679844164834517E-03 max=   3.6386233175123922E-01 u Beginning of step_MOM  [uv]
-  u-point: c=    320978 sw=    316992 se=    316992 nw=    316992 ne=    316992 u Beginning of step_MOM  [uv]
-  v-point: mean=   0.0000000000000000E+00 min=   0.0000000000000000E+00 max=   0.0000000000000000E+00 v Beginning of step_MOM  [uv]
-  v-point: c=         0 sw=         0 se=         0 nw=         0 ne=         0 v Beginning of step_MOM  [uv]
-  h-point: mean=   1.0000000000000000E+03 min=   2.0022236368437586E+02 max=   1.7997776363156240E+03 Beginning of step_MOM  h
-  h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h
-
-Send to stderr (expect a *lot* of output!)
-
-(See also ``DIAG_AS_CHKSUM``)
-
-
-Debug Syntax
-============
-
-``h-point:``
-   Diagnostic is on a center point
-
-``mean``, ``min``, ``max``
-   Calculated over the compute domain (no halos)
-
-``c=``
-   Bit checksum over compute domain
-
-``sw=``, ``se=``, ``nw=``, ``ne=``
-   Checksum after domain shifted into halos
-
-
-Call Tree
-=========
-
-In ``MOM_unit``::
-
-   VERBOSITY=9
-
-Produces call tree (and other info):
-
-.. include:: doc/calltree.out
-   :code:
-
-
-Dimensional Consistency
-=======================
-
-
-
-
-Rotational Consistency
-======================
-
-
-
-Exercise
-========
-
-Check out fork and compile:
-
-.. code:: fortran
-
-   cd MOM6-examples/src/MOM6
-   git fetch
-   git checkout demo-layout-issue
-   # You remember how to compile, right?
-
-Run with 1 and 4 CPUs
-
-.. code:: fortran
-
-   cd ../../ocean_only/Phillips_2layer
-   mpirun -np 1 ../../build/ocean_only/MOM6
-   cp ocean.stats ocean.stats.p1
-   mpirun -np 4 ../../build/ocean_only/MOM6
-   cp ocean.stats ocean.stats.p4
-   diff ocean.stats.p1 ocean.stats.p4
-
-Do they agree?

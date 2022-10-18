@@ -68,58 +68,43 @@
 <p>Presentation is available at</p>
 <p><a href="https://marshallward.org/mom6workshop/develop.html">https://marshallward.org/mom6workshop/develop.html</a></p>
 </section>
-<section id="style-matters" class="title-slide slide level1">
-<h1>Style Matters</h1>
-<p>From Griffies and Hallberg (2000):</p>
-<pre><code>This paper discusses a NUMERICAL CLOSURE,motivated from the ideas of
-Smagorinsky, for use with a
-bi
-   harmonic
-      operator.
-The result is    a  highly
-   scale -selective,state- dependent
-friction operator for use in
-eddy  -permitting geophysical fluid models.</code></pre>
-<p>Would you write like this?</p>
-</section>
-
-<section id="syntax-style" class="title-slide slide level1">
-<h1>Syntax Style</h1>
-<ul>
-<li><p>Indent properly!</p></li>
-<li><p>Respect line length (&lt;=120 characters)</p>
-<ul>
-<li>&lt;80 is even better!</li>
-</ul></li>
-<li><p><code>snake_case</code></p></li>
-<li><p>Space around operators: <code>if (a == 0)</code></p></li>
-<li><p>No space in function args: <code>call f(a, b, c=0)</code></p></li>
-</ul>
-</section>
-
-<section id="array-style" class="title-slide slide level1">
-<h1>Array Style</h1>
-<ul>
-<li><p>This is bad: <code>u = 0.</code></p></li>
-<li><p>This is OK: <code>u(:,:,:) = 0.</code></p>
-<ul>
-<li>But only for assignment and initialization</li>
-</ul></li>
-<li><p>Explicit loops:</p>
-<pre class="fortran"><code>do j = js, je ; do i = is, ie
-  u(i,j) = v(i,j) + w(i,j)**2
-enddo ; enddo</code></pre></li>
-<li><p>Index convention: <code>ij</code> on centers, <code>IJ</code> on edges</p></li>
-</ul>
-</section>
-
-<section id="why-style" class="title-slide slide level1">
-<h1>Why Style?</h1>
-<ul>
-<li>Consistent patterns: faster to read, faster to write</li>
-<li>Reduce the size of git commits</li>
-</ul>
-<p><a href="https://github.com/mom-ocean/MOM6/wiki/Code-style-guide">Read the guide!</a></p>
+<section id="ci-testing" class="title-slide slide level1">
+<h1>CI Testing</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Test</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mem Layout</td>
+<td>Symmetric vs Nonsymmetric</td>
+</tr>
+<tr class="even">
+<td>OpenMP</td>
+<td>With threads</td>
+</tr>
+<tr class="odd">
+<td>CPU Layout</td>
+<td>1 vs 2 CPUs</td>
+</tr>
+<tr class="even">
+<td>Rotation</td>
+<td>90° Domain Turn</td>
+</tr>
+<tr class="odd">
+<td>NaN Init</td>
+<td>Aggressive initialization</td>
+</tr>
+<tr class="even">
+<td>Regression</td>
+<td>Answer changes</td>
+</tr>
+</tbody>
+</table>
+<p>Also tests for documentation, MacOS support, etc</p>
 </section>
 
 <section id="reproducibility" class="title-slide slide level1">
@@ -146,9 +131,10 @@ enddo ; enddo</code></pre></li>
 <ul>
 <li><code>sum()</code> is ambiguous; what is the order?</li>
 <li>use <code>reproducing_sum()</code></li>
-<li>Avoid <code>sin()</code>, <code>exp()</code>, etc</li>
+<li>Avoid <code>sin()</code>, <code>exp()</code>, even <code>a**b</code></li>
 </ul></li>
 </ul>
+<p>See <a href="https://www.marshallward.org/fortrancon2021/">my FortranCon talk</a> for more about this</p>
 </section>
 
 <section id="bit-repro-debugging" class="title-slide slide level1">
@@ -253,6 +239,11 @@ NOTE: callTree: &lt;--- Main loop
 
 </section>
 
+<section id="test-suite-revisited" class="title-slide slide level1">
+<h1>Test Suite (revisited)</h1>
+
+</section>
+
 <section id="exercise" class="title-slide slide level1">
 <h1>Exercise</h1>
 <p>Check out fork and compile:</p>
@@ -268,6 +259,60 @@ mpirun -np 4 ../../build/ocean_only/MOM6
 cp ocean.stats ocean.stats.p4
 diff ocean.stats.p1 ocean.stats.p4</code></pre>
 <p>Do they agree?</p>
+</section>
+
+<section id="style-matters" class="title-slide slide level1">
+<h1>Style Matters</h1>
+<p>From Griffies and Hallberg (2000):</p>
+<pre><code>This paper discusses a NUMERICAL CLOSURE,motivated from the ideas of
+Smagorinsky, for use with a
+bi
+   harmonic
+      operator.
+The result is    a  highly
+   scale -selective,state- dependent
+friction operator for use in
+eddy  -permitting geophysical fluid models.</code></pre>
+<p>Would you write like this?</p>
+</section>
+
+<section id="syntax-style" class="title-slide slide level1">
+<h1>Syntax Style</h1>
+<ul>
+<li><p>Indent properly!</p></li>
+<li><p>Respect line length (&lt;=120 characters)</p>
+<ul>
+<li>&lt;80 is even better!</li>
+</ul></li>
+<li><p><code>snake_case</code></p></li>
+<li><p>Space around operators: <code>if (a == 0)</code></p></li>
+<li><p>No space in function args: <code>call f(a, b, c=0)</code></p></li>
+</ul>
+</section>
+
+<section id="array-style" class="title-slide slide level1">
+<h1>Array Style</h1>
+<ul>
+<li><p>This is bad: <code>u = 0.</code></p></li>
+<li><p>This is OK: <code>u(:,:,:) = 0.</code></p>
+<ul>
+<li>But only for assignment and initialization</li>
+</ul></li>
+<li><p>Explicit loops:</p>
+<pre class="fortran"><code>do j = js, je ; do i = is, ie
+  u(i,j) = v(i,j) + w(i,j)**2
+enddo ; enddo</code></pre></li>
+<li><p>Index convention: <code>ij</code> on centers, <code>IJ</code> on edges</p></li>
+</ul>
+</section>
+
+<section id="why-style" class="title-slide slide level1">
+<h1>Why Style?</h1>
+<ul>
+<li>Consistent patterns: faster to read, faster to write</li>
+<li>Reduce the size of git commits</li>
+</ul>
+<p><a href="https://github.com/mom-ocean/MOM6/wiki/Code-style-guide">Read the guide!</a></p>
 </section>
     </div>
   </div>
