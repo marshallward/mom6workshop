@@ -1,0 +1,51 @@
+NOTE: callTree:    ---> step_MOM(), MOM.F90
+NOTE: callTree:       loop DT cycles (step_MOM) n=       1
+NOTE: callTree:          o done with set_viscous_BBL (step_MOM)
+NOTE: callTree:          ---> step_MOM_dyn_split_RK2(), MOM_dynamics_split_RK2.F90
+NOTE: callTree:             o done with PressureForce (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with vertvisc_coef (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity[BT_cont] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---> btstep(), MOM_barotropic.F90
+NOTE: btstep is using a dynamic barotropic timestep of 7.500000E+01 seconds, max 8.529637E+01.
+NOTE: callTree:             <--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with btcalc[BT_cont_BT_thick] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with horizontal_viscosity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---> btstep(), MOM_barotropic.F90
+NOTE: callTree:             <--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:          <--- step_MOM_dyn_split_RK2()
+NOTE: callTree:          o finished step_MOM_dyn_split (step_MOM)
+NOTE: callTree:          o finished thickness_diffuse (step_MOM)
+NOTE: callTree:       <--- DT cycles (step_MOM)
+NOTE: callTree:       loop DT cycles (step_MOM) n=       2
+NOTE: callTree:          ---> step_MOM_dyn_split_RK2(), MOM_dynamics_split_RK2.F90
+NOTE: callTree:             o done with PressureForce (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with vertvisc_coef (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity[BT_cont] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---> btstep(), MOM_barotropic.F90
+NOTE: callTree:             <--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with btcalc[BT_cont_BT_thick] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with horizontal_viscosity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---> btstep(), MOM_barotropic.F90
+NOTE: callTree:             <--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:          <--- step_MOM_dyn_split_RK2()
+NOTE: callTree:          o finished step_MOM_dyn_split (step_MOM)
+NOTE: callTree:          o finished thickness_diffuse (step_MOM)
+NOTE: callTree:       <--- DT cycles (step_MOM)
+....
+NOTE: callTree:       o calling extract_surface_state (step_MOM)
+NOTE: callTree:       ---> extract_surface_state(), MOM.F90
+NOTE: callTree:       <--- extract_surface_sfc_state()
+NOTE: callTree:    <--- step_MOM()
+NOTE: callTree: <--- Main loop

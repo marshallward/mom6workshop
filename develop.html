@@ -63,6 +63,11 @@
   </aside>
 </section>
 
+<section class="slide level2">
+
+<p>Presentation is available at</p>
+<p><a href="https://marshallward.org/mom6workshop/develop.html">https://marshallward.org/mom6workshop/develop.html</a></p>
+</section>
 <section id="style-matters" class="title-slide slide level1">
 <h1>Style Matters</h1>
 <p>From Griffies and Hallberg (2000):</p>
@@ -71,11 +76,10 @@ Smagorinsky, for use with a
 bi
    harmonic
       operator.
-
-The result is a highly
-   SCALE-selective,STATE-dependent
+The result is    a  highly
+   scale -selective,state- dependent
 friction operator for use in
-eddy-permitting geophysical fluid models.</code></pre>
+eddy  -permitting geophysical fluid models.</code></pre>
 <p>Would you write like this?</p>
 </section>
 
@@ -88,10 +92,8 @@ eddy-permitting geophysical fluid models.</code></pre>
 <li>&lt;80 is even better!</li>
 </ul></li>
 <li><p><code>snake_case</code></p></li>
-<li><p>Space around operators: <code>if (a == 0)</code></p>
-<ul>
-<li>No space inside function arguments: <code>call f(a, b, c=0)</code></li>
-</ul></li>
+<li><p>Space around operators: <code>if (a == 0)</code></p></li>
+<li><p>No space in function args: <code>call f(a, b, c=0)</code></p></li>
 </ul>
 </section>
 
@@ -104,7 +106,7 @@ eddy-permitting geophysical fluid models.</code></pre>
 <li>But only for assignment and initialization</li>
 </ul></li>
 <li><p>Explicit loops:</p>
-<pre><code>do j = js, je ; do i = is, ie
+<pre class="fortran"><code>do j = js, je ; do i = is, ie
   u(i,j) = v(i,j) + w(i,j)**2
 enddo ; enddo</code></pre></li>
 <li><p>Index convention: <code>ij</code> on centers, <code>IJ</code> on edges</p></li>
@@ -117,7 +119,7 @@ enddo ; enddo</code></pre></li>
 <li>Consistent patterns: faster to read, faster to write</li>
 <li>Reduce the size of git commits</li>
 </ul>
-<p>See <a href="https://github.com/mom-ocean/MOM6/wiki/Code-style-guide">https://github.com/mom-ocean/MOM6/wiki/Code-style-guide</a></p>
+<p><a href="https://github.com/mom-ocean/MOM6/wiki/Code-style-guide">Read the guide!</a></p>
 </section>
 
 <section id="reproducibility" class="title-slide slide level1">
@@ -125,55 +127,11 @@ enddo ; enddo</code></pre></li>
 <p>Numerical results must reproduce:</p>
 <p><em>Even floating point!</em></p>
 <p>Verification is based on <code>ocean.stats</code>:</p>
-<pre><code>TODO</code></pre>
-</section>
-
-<section id="numerical-style" class="title-slide slide level1">
-<h1>Numerical "style"</h1>
-<ul>
-<li>No ambiguous ordering
-<ul>
-<li>Bad: <code>a + b + c</code></li>
-<li>OK: <code>(a + b) + c</code></li>
-</ul></li>
-<li>No double divisions:
-<ul>
-<li>Bad: <code>a / (b + c / d)</code></li>
-<li>Better: <code>a * d / (b * d + c)</code></li>
-</ul></li>
-<li>Use "inverse" variables for repeated divisions:
-<ul>
-<li><code>Iarea = 1.0 / area</code></li>
-<li><code>u = a * Iarea;    v = b * Iarea</code></li>
-</ul></li>
-</ul>
-</section>
-
-<section id="avoid-intrinsics" class="title-slide slide level1">
-<h1>Avoid Intrinsics</h1>
-<p><code>sum()</code> is ambiguous: what is the order?</p>
-<ul>
-<li>Use <code>reproducing_sum()</code></li>
-</ul>
-<p><code>sin()</code>, <code>exp()</code>, are also problematic, avoid where possible.</p>
-</section>
-
-<section id="performance" class="title-slide slide level1">
-<h1>Performance</h1>
-<p>If-statements in loops suppress vectorization:</p>
-<pre class="fortran"><code>do j=jsc,jec ; do i=isc,jec
-   a = b + c
-   if (some_feature) a = a + d
-enddo ; enddo</code></pre>
-<p>Split the loop, move outside:</p>
-<pre class="fortran"><code>do j=jsc,jec ; do i=isc,jec
-   a = b + c
-enddo ; enddo
-if (some_feature) then
-   do j=jsc,jec ; do i=isc,jec
-      a = a + d
-   enddo ; enddo
-endif</code></pre>
+<pre><code>Step,       Day,  Truncs,      Energy/Mass,      Maximum CFL,  Mean sea level,   Total Mass,    Frac Mass Err
+       [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
+0,       0.000,     0, En 3.3361965169932362E-01, CFL  0.01092, SL -0.0000E+00, Mass 3.95904E+18, Me  0.00E+00
+144,       1.000,     0, En 3.3113616621947212E-01, CFL  0.01064, SL -0.0000E+00, Mass 3.95904E+18, Me -4.25E-18</code></pre>
+<p>Energy/Mass is machine-precision and reproducible</p>
 </section>
 
 <section id="debug-mode" class="title-slide slide level1">
@@ -187,7 +145,7 @@ v-point: mean=   0.0000000000000000E+00 min=   0.0000000000000000E+00 max=   0.0
 v-point: c=         0 sw=         0 se=         0 nw=         0 ne=         0 v Beginning of step_MOM  [uv]
 h-point: mean=   1.0000000000000000E+03 min=   2.0022236368437586E+02 max=   1.7997776363156240E+03 Beginning of step_MOM  h
 h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h</code></pre>
-<p>Send to stderr (expect a <em>lot</em>, reduce run time!)</p>
+<p>Send to stderr (expect a <em>lot</em> of output!)</p>
 </section>
 
 <section id="debug-syntax" class="title-slide slide level1">
@@ -206,6 +164,65 @@ h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Be
 <dd><p>Checksum after domain shifted into halos</p>
 </dd>
 </dl>
+</section>
+
+<section id="call-tree" class="title-slide slide level1">
+<h1>Call Tree</h1>
+<p>In <code>MOM_unit</code>:</p>
+<pre><code>VERBOSITY=9</code></pre>
+<p>Produces call tree (and other info):</p>
+<pre class="" data-code=""><code>NOTE: callTree:    ---&gt; step_MOM(), MOM.F90
+NOTE: callTree:       loop DT cycles (step_MOM) n=       1
+NOTE: callTree:          o done with set_viscous_BBL (step_MOM)
+NOTE: callTree:          ---&gt; step_MOM_dyn_split_RK2(), MOM_dynamics_split_RK2.F90
+NOTE: callTree:             o done with PressureForce (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with vertvisc_coef (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity[BT_cont] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---&gt; btstep(), MOM_barotropic.F90
+NOTE: btstep is using a dynamic barotropic timestep of 7.500000E+01 seconds, max 8.529637E+01.
+NOTE: callTree:             &lt;--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with btcalc[BT_cont_BT_thick] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with horizontal_viscosity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---&gt; btstep(), MOM_barotropic.F90
+NOTE: callTree:             &lt;--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:          &lt;--- step_MOM_dyn_split_RK2()
+NOTE: callTree:          o finished step_MOM_dyn_split (step_MOM)
+NOTE: callTree:          o finished thickness_diffuse (step_MOM)
+NOTE: callTree:       &lt;--- DT cycles (step_MOM)
+NOTE: callTree:       loop DT cycles (step_MOM) n=       2
+NOTE: callTree:          ---&gt; step_MOM_dyn_split_RK2(), MOM_dynamics_split_RK2.F90
+NOTE: callTree:             o done with PressureForce (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with vertvisc_coef (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity[BT_cont] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---&gt; btstep(), MOM_barotropic.F90
+NOTE: callTree:             &lt;--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with btcalc[BT_cont_BT_thick] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with horizontal_viscosity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---&gt; btstep(), MOM_barotropic.F90
+NOTE: callTree:             &lt;--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with CorAdCalc (step_MOM_dyn_split_RK2)
+NOTE: callTree:          &lt;--- step_MOM_dyn_split_RK2()
+NOTE: callTree:          o finished step_MOM_dyn_split (step_MOM)
+NOTE: callTree:          o finished thickness_diffuse (step_MOM)
+NOTE: callTree:       &lt;--- DT cycles (step_MOM)
+....
+NOTE: callTree:       o calling extract_surface_state (step_MOM)
+NOTE: callTree:       ---&gt; extract_surface_state(), MOM.F90
+NOTE: callTree:       &lt;--- extract_surface_sfc_state()
+NOTE: callTree:    &lt;--- step_MOM()
+NOTE: callTree: &lt;--- Main loop
+</code></pre>
 </section>
 
 <section id="exercise-1" class="title-slide slide level1">

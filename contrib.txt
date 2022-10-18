@@ -259,7 +259,7 @@ Gaea Regression
 Final Approval
 ==============
 
-If all of the tests pass, then a human being gets involved and evaluates the
+If all of the tests pass, then a human being (finally) evaluates the
 contribution.
 
 Three options:

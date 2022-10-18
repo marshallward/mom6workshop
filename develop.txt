@@ -9,6 +9,12 @@ MOM6 Development
 :preface:
    TODO
 
+----
+
+Presentation is available at
+
+https://marshallward.org/mom6workshop/develop.html
+
 
 Style Matters
 =============
@@ -20,11 +26,10 @@ From Griffies and Hallberg (2000)::
    bi
       harmonic
          operator.
-
-   The result is a highly
-      SCALE-selective,STATE-dependent
+   The result is    a  highly
+      scale -selective,state- dependent
    friction operator for use in
-   eddy-permitting geophysical fluid models.
+   eddy  -permitting geophysical fluid models.
 
 Would you write like this?
 
@@ -42,7 +47,8 @@ Syntax Style
 
 * Space around operators: ``if (a == 0)``
 
-   * No space inside function arguments: ``call f(a, b, c=0)``
+* No space in function args: ``call f(a, b, c=0)``
+
 
 Array Style
 ===========
@@ -53,7 +59,9 @@ Array Style
 
    * But only for assignment and initialization
 
-* Explicit loops::
+* Explicit loops:
+
+  .. code:: fortran
 
     do j = js, je ; do i = is, ie
       u(i,j) = v(i,j) + w(i,j)**2
@@ -69,7 +77,9 @@ Why Style?
 
 * Reduce the size of git commits
 
-See https://github.com/mom-ocean/MOM6/wiki/Code-style-guide
+`Read the guide!`_
+
+.. _Read the guide!: https://github.com/mom-ocean/MOM6/wiki/Code-style-guide
 
 
 Reproducibility
@@ -81,59 +91,38 @@ Numerical results must reproduce:
 
 Verification is based on ``ocean.stats``::
 
-   TODO
+     Step,       Day,  Truncs,      Energy/Mass,      Maximum CFL,  Mean sea level,   Total Mass,    Frac Mass Err
+            [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
+     0,       0.000,     0, En 3.3361965169932362E-01, CFL  0.01092, SL -0.0000E+00, Mass 3.95904E+18, Me  0.00E+00
+   144,       1.000,     0, En 3.3113616621947212E-01, CFL  0.01064, SL -0.0000E+00, Mass 3.95904E+18, Me -4.25E-18
+
+Energy/Mass is machine-precision and reproducible
 
 
-Numerical "style"
-=================
+.. Numerical "style"
+   =================
 
-* No ambiguous ordering
-  * Bad: ``a + b + c``
-  * OK: ``(a + b) + c``
+   * No ambiguous ordering
+     * Bad: ``a + b + c``
+     * OK: ``(a + b) + c``
 
-* No double divisions:
-  * Bad: ``a / (b + c / d)``
-  * Better: ``a * d / (b * d + c)``
+   * No double divisions:
+     * Bad: ``a / (b + c / d)``
+     * Better: ``a * d / (b * d + c)``
 
-* Use "inverse" variables for repeated divisions:
-  * ``Iarea = 1.0 / area``
-  * ``u = a * Iarea;    v = b * Iarea``
-
-
-Avoid Intrinsics
-================
-
-``sum()`` is ambiguous: what is the order?
-
-* Use ``reproducing_sum()``
-
-``sin()``, ``exp()``, are also problematic, avoid where possible.
+   * Use "inverse" variables for repeated divisions:
+     * ``Iarea = 1.0 / area``
+     * ``u = a * Iarea;    v = b * Iarea``
 
 
-Performance
-===========
+.. Avoid Intrinsics
+   ================
 
-If-statements in loops suppress vectorization:
+   ``sum()`` is ambiguous: what is the order?
 
-.. code:: fortran
+   * Use ``reproducing_sum()``
 
-   do j=jsc,jec ; do i=isc,jec
-      a = b + c
-      if (some_feature) a = a + d
-   enddo ; enddo
-
-Split the loop, move outside:
-
-.. code:: fortran
-
-   do j=jsc,jec ; do i=isc,jec
-      a = b + c
-   enddo ; enddo
-   if (some_feature) then
-      do j=jsc,jec ; do i=isc,jec
-         a = a + d
-      enddo ; enddo
-   endif
+   ``sin()``, ``exp()``, are also problematic, avoid where possible.
 
 
 Debug Mode
@@ -152,7 +141,7 @@ This enables checksums in the output::
   h-point: mean=   1.0000000000000000E+03 min=   2.0022236368437586E+02 max=   1.7997776363156240E+03 Beginning of step_MOM  h
   h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h
 
-Send to stderr (expect a *lot*, reduce run time!)
+Send to stderr (expect a *lot* of output!)
 
 
 Debug Syntax
@@ -169,6 +158,19 @@ Debug Syntax
 
 ``sw=``, ``se=``, ``nw=``, ``ne=``
    Checksum after domain shifted into halos
+
+
+Call Tree
+=========
+
+In ``MOM_unit``::
+
+   VERBOSITY=9
+
+Produces call tree (and other info):
+
+.. include:: doc/calltree.out
+   :code:
 
 
 Exercise 1
