@@ -22,7 +22,7 @@ The MOM6 Repository
 .. image:: img/mom6repo.png
    :target: https://github.com/NOAA-GFDL/MOM6.git
 
-MOM6-examples pulls from this repository.
+Contained in the MOM6-examples repository
 
 
 The MOM6 Consortium
@@ -99,9 +99,9 @@ Add a welcome message:
    --- a/src/core/MOM.F90
    +++ b/src/core/MOM.F90
    @@ -1912,6 +1912,8 @@ subroutine initialize_MOM(Time, Time_init, param_file, dirs, CS, restart_CSp, &
-   
+
       CS%Time => Time
-   
+
    +  print *, "Welcome to MOM6!"
    +
       id_clock_init = cpu_clock_id('Ocean Initialization', grain=CLOCK_SUBCOMPONENT)
@@ -128,7 +128,7 @@ Check status::
      (use "git add <file>..." to update what will be committed)
      (use "git restore <file>..." to discard changes in working directory)
    	modified:   src/core/MOM_CoriolisAdv.F90
-   
+
    no changes added to commit (use "git add" and/or "git commit -a")
 
 Add file::
@@ -144,7 +144,7 @@ Commit the file::
    $ git commit
    [my_feature 02244bd3b] Enstrophy density diagnostic
    1 file changed, 13 insertions(+)
-   
+
 Write a meaningful message:
 
 .. image:: img/commit_log.png
@@ -155,14 +155,14 @@ Commits as email
 
 * Pre-git, commits were *emails* sent to maintainers
 
-   * The patch was the commit
-   
-   * The log was the email (subject + body)
+   * The message was the email (subject + body)
+
+   * The patch was an attachment
 
 * Emails follow a standard format (RFC 5822)
 
    * "Lines … SHOULD be limited to 78 characters"
-   
+
    * Subject reduced to ~50, leave space for hash
 
 The closer you follow these rules, the better the results
@@ -245,11 +245,9 @@ GitHub Actions run the internal test suite
    $ make -j
    $ make -j test
 
-Results:
-
 1. ``dev/gfdl`` was out of date (missing MacOS fix)
 
-2. New diagnostic was missing from OpenMP directives
+2. New variable needs to be in OpenMP directive
 
 
 Gaea Regression
@@ -270,6 +268,32 @@ Three options:
 * Rebase
 * Squash
 
+Merges preserve commits; the others change hashes!
+
+
+Merge Types
+===========
+
+.. list-table::
+
+   * - .. figure:: img/merge.jpg
+
+     - .. figure:: img/squash.jpg
+
+   * -    Merge
+
+     -    Squash
+
+.. figure:: img/rebase.jpg
+   :width: 50%
+
+   Rebase
+
+(`dnjscksdn98.log`_)
+
+.. _dnjscksdn98.log:
+   https://velog.io/@dnjscksdn98/Git-Merge-vs-Squash-Merge-vs-Rebase-Merge
+
 
 GitHub Merge
 ============
@@ -279,10 +303,6 @@ GitHub merges are "non-fast-forward".   They create a *merge commit*.
 .. image:: img/git_ff.png
    :width: 50%
 
-This preserves the history of the original branch.
+But FF merge is not always possible.
 
 
-Epilogue: Merge to ``main``
-===========================
-
-TODO

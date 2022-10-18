@@ -10,25 +10,78 @@ MOM6 Development
    TODO
 
 
-The MOM6 Test Suite
-===================
+Style Matters
+=============
+
+From Griffies and Hallberg (2000)::
+
+   This paper discusses a NUMERICAL CLOSURE,motivated from the ideas of
+   Smagorinsky, for use with a
+   bi
+      harmonic
+         operator.
+
+   The result is a highly
+      SCALE-selective,STATE-dependent
+   friction operator for use in
+   eddy-permitting geophysical fluid models.
+
+Would you write like this?
 
 
-Style Guide
-===========
-
-Main rules:
+Syntax Style
+============
 
 * Indent properly!
+
 * Respect line length (<=120 characters)
+
+   * <80 is even better!
+
 * ``snake_case``
-* Index convention (``i/j`` on centers, ``I/J`` on edges)
-* Array syntax:
-   * This is bad: ``u = 0.``
-   * This is OK: ``u(:,:,:) = 0.``
-      * But only for assignment and initialization
+
+* Space around operators: ``if (a == 0)``
+
+   * No space inside function arguments: ``call f(a, b, c=0)``
+
+Array Style
+===========
+
+* This is bad: ``u = 0.``
+
+* This is OK: ``u(:,:,:) = 0.``
+
+   * But only for assignment and initialization
+
+* Explicit loops::
+
+    do j = js, je ; do i = is, ie
+      u(i,j) = v(i,j) + w(i,j)**2
+    enddo ; enddo
+
+* Index convention: ``ij`` on centers, ``IJ`` on edges
+
+
+Why Style?
+==========
+
+* Consistent patterns: faster to read, faster to write
+
+* Reduce the size of git commits
 
 See https://github.com/mom-ocean/MOM6/wiki/Code-style-guide
+
+
+Reproducibility
+===============
+
+Numerical results must reproduce:
+
+*Even floating point!*
+
+Verification is based on ``ocean.stats``::
+
+   TODO
 
 
 Numerical "style"
@@ -47,8 +100,18 @@ Numerical "style"
   * ``u = a * Iarea;    v = b * Iarea``
 
 
-More numeric tricks
-===================
+Avoid Intrinsics
+================
+
+``sum()`` is ambiguous: what is the order?
+
+* Use ``reproducing_sum()``
+
+``sin()``, ``exp()``, are also problematic, avoid where possible.
+
+
+Performance
+===========
 
 If-statements in loops suppress vectorization:
 

@@ -63,35 +63,69 @@
   </aside>
 </section>
 
-<section id="the-mom6-test-suite" class="title-slide slide level1">
-<h1>The MOM6 Test Suite</h1>
+<section id="style-matters" class="title-slide slide level1">
+<h1>Style Matters</h1>
+<p>From Griffies and Hallberg (2000):</p>
+<pre><code>This paper discusses a NUMERICAL CLOSURE,motivated from the ideas of
+Smagorinsky, for use with a
+bi
+   harmonic
+      operator.
 
+The result is a highly
+   SCALE-selective,STATE-dependent
+friction operator for use in
+eddy-permitting geophysical fluid models.</code></pre>
+<p>Would you write like this?</p>
 </section>
 
-<section id="style-guide" class="title-slide slide level1">
-<h1>Style Guide</h1>
-<p>Main rules:</p>
+<section id="syntax-style" class="title-slide slide level1">
+<h1>Syntax Style</h1>
 <ul>
-<li>Indent properly!</li>
-<li>Respect line length (&lt;=120 characters)</li>
-<li><code>snake_case</code></li>
-<li>Index convention (<code>i/j</code> on centers, <code>I/J</code> on edges)</li>
-<li><dl>
-<dt>Array syntax:</dt>
-<dd><ul>
-<li>This is bad: <code>u = 0.</code></li>
-<li><dl>
-<dt>This is OK: <code>u(:,:,:) = 0.</code></dt>
-<dd><ul>
+<li><p>Indent properly!</p></li>
+<li><p>Respect line length (&lt;=120 characters)</p>
+<ul>
+<li>&lt;80 is even better!</li>
+</ul></li>
+<li><p><code>snake_case</code></p></li>
+<li><p>Space around operators: <code>if (a == 0)</code></p>
+<ul>
+<li>No space inside function arguments: <code>call f(a, b, c=0)</code></li>
+</ul></li>
+</ul>
+</section>
+
+<section id="array-style" class="title-slide slide level1">
+<h1>Array Style</h1>
+<ul>
+<li><p>This is bad: <code>u = 0.</code></p></li>
+<li><p>This is OK: <code>u(:,:,:) = 0.</code></p>
+<ul>
 <li>But only for assignment and initialization</li>
+</ul></li>
+<li><p>Explicit loops:</p>
+<pre><code>do j = js, je ; do i = is, ie
+  u(i,j) = v(i,j) + w(i,j)**2
+enddo ; enddo</code></pre></li>
+<li><p>Index convention: <code>ij</code> on centers, <code>IJ</code> on edges</p></li>
 </ul>
-</dd>
-</dl></li>
-</ul>
-</dd>
-</dl></li>
+</section>
+
+<section id="why-style" class="title-slide slide level1">
+<h1>Why Style?</h1>
+<ul>
+<li>Consistent patterns: faster to read, faster to write</li>
+<li>Reduce the size of git commits</li>
 </ul>
 <p>See <a href="https://github.com/mom-ocean/MOM6/wiki/Code-style-guide">https://github.com/mom-ocean/MOM6/wiki/Code-style-guide</a></p>
+</section>
+
+<section id="reproducibility" class="title-slide slide level1">
+<h1>Reproducibility</h1>
+<p>Numerical results must reproduce:</p>
+<p><em>Even floating point!</em></p>
+<p>Verification is based on <code>ocean.stats</code>:</p>
+<pre><code>TODO</code></pre>
 </section>
 
 <section id="numerical-style" class="title-slide slide level1">
@@ -115,8 +149,17 @@
 </ul>
 </section>
 
-<section id="more-numeric-tricks" class="title-slide slide level1">
-<h1>More numeric tricks</h1>
+<section id="avoid-intrinsics" class="title-slide slide level1">
+<h1>Avoid Intrinsics</h1>
+<p><code>sum()</code> is ambiguous: what is the order?</p>
+<ul>
+<li>Use <code>reproducing_sum()</code></li>
+</ul>
+<p><code>sin()</code>, <code>exp()</code>, are also problematic, avoid where possible.</p>
+</section>
+
+<section id="performance" class="title-slide slide level1">
+<h1>Performance</h1>
 <p>If-statements in loops suppress vectorization:</p>
 <pre class="fortran"><code>do j=jsc,jec ; do i=isc,jec
    a = b + c

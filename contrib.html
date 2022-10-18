@@ -71,7 +71,7 @@
 <section id="the-mom6-repository" class="title-slide slide level1">
 <h1>The MOM6 Repository</h1>
 <p><a href="https://github.com/NOAA-GFDL/MOM6.git"><img data-src="img/mom6repo.png" alt="image" /></a></p>
-<p>MOM6-examples pulls from this repository.</p>
+<p>Contained in the MOM6-examples repository</p>
 </section>
 
 <section id="the-mom6-consortium" class="title-slide slide level1">
@@ -225,8 +225,8 @@ no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&q
 <ul>
 <li><p>Pre-git, commits were <em>emails</em> sent to maintainers</p>
 <ul>
-<li>The patch was the commit</li>
-<li>The log was the email (subject + body)</li>
+<li>The message was the email (subject + body)</li>
+<li>The patch was an attachment</li>
 </ul></li>
 <li><p>Emails follow a standard format (RFC 5822)</p>
 <ul>
@@ -290,10 +290,9 @@ $ git push --force marshall my_feature    # Rewrite history</code></pre>
 $ cd .testing
 $ make -j
 $ make -j test</code></pre>
-<p>Results:</p>
 <ol type="1">
 <li><code>dev/gfdl</code> was out of date (missing MacOS fix)</li>
-<li>New diagnostic was missing from OpenMP directives</li>
+<li>New variable needs to be in OpenMP directive</li>
 </ol>
 </section>
 
@@ -311,18 +310,34 @@ $ make -j test</code></pre>
 <li>Rebase</li>
 <li>Squash</li>
 </ul>
+<p>Merges preserve commits; the others change hashes!</p>
+</section>
+
+<section id="merge-types" class="title-slide slide level1">
+<h1>Merge Types</h1>
+<table>
+<tbody>
+<tr class="odd">
+<td><img data-src="img/merge.jpg" title="fig:" /></td>
+<td><img data-src="img/squash.jpg" title="fig:" /></td>
+</tr>
+<tr class="even">
+<td>Merge</td>
+<td>Squash</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img data-src="img/rebase.jpg" style="width:50.0%" alt="Rebase" /><figcaption aria-hidden="true">Rebase</figcaption>
+</figure>
+<p>(<a href="https://velog.io/@dnjscksdn98/Git-Merge-vs-Squash-Merge-vs-Rebase-Merge">dnjscksdn98.log</a>)</p>
 </section>
 
 <section id="github-merge" class="title-slide slide level1">
 <h1>GitHub Merge</h1>
 <p>GitHub merges are "non-fast-forward". They create a <em>merge commit</em>.</p>
 <p><img data-src="img/git_ff.png" style="width:50.0%" alt="image" /></p>
-<p>This preserves the history of the original branch.</p>
-</section>
-
-<section id="epilogue-merge-to-main" class="title-slide slide level1">
-<h1>Epilogue: Merge to <code>main</code></h1>
-<p>TODO</p>
+<p>But FF merge is not always possible.</p>
 </section>
     </div>
   </div>

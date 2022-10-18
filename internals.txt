@@ -285,7 +285,7 @@ Index Bounds
 Bounds stored in ``ocean_grid_type``, ``G``
 
 .. list-table::
-   :widths: 50 50 
+   :widths: 50 50
 
    * - =================
        ``G%isc:G%iec``
@@ -293,7 +293,7 @@ Bounds stored in ``ocean_grid_type``, ``G``
        ``G%isd:G%ied``
        ``G%isg:G%ieg``
        ...
-       =================  
+       =================
 
      - .. code::
 
@@ -332,7 +332,7 @@ Memory Layout
 Index Macros
 ============
 
-Generalized indices with ``#include <MOM_memory.h>``
+Generalized indices with ``MOM_memory.h``
 
 ==========  ==================================
 Field       Declaration
@@ -343,7 +343,7 @@ North Face  ``v(SZI_(G), SZJB_(G), SZK_(G))``
 Vertex      ``q(SZIB_(G), SZJB_(G), SZK_(G))``
 ==========  ==================================
 
-These ensure that edge-indices are zero-indexed
+Ensure that symmetric edge-indices are zero-indexed
 
 (Also see ``ALLOC_()``, ``DEALLOC_()``, ``ALLOCABLE_``)
 
@@ -485,7 +485,7 @@ Timers
    id_clock_ocean = cpu_clock_id('Ocean', grain=CLOCK_COMPONENT)
 
    ! Main loop
-   
+
    ! Start timer
    call cpu_clock_begin(id_clock_ocean)
 
