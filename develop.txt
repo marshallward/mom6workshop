@@ -91,42 +91,34 @@ Numerical results must reproduce:
 
 Verification is based on ``ocean.stats``::
 
-     Step,       Day,  Truncs,      Energy/Mass,      Maximum CFL,  Mean sea level,   Total Mass,    Frac Mass Err
-            [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
+   Step,       Day,  Truncs,      Energy/Mass,      Maximum CFL,  Mean sea level,   Total Mass,    Frac Mass Err
+             [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
      0,       0.000,     0, En 3.3361965169932362E-01, CFL  0.01092, SL -0.0000E+00, Mass 3.95904E+18, Me  0.00E+00
    144,       1.000,     0, En 3.3113616621947212E-01, CFL  0.01064, SL -0.0000E+00, Mass 3.95904E+18, Me -4.25E-18
 
 Energy/Mass is machine-precision and reproducible
 
 
-.. Numerical "style"
-   =================
+Numerical "style"
+=================
 
-   * No ambiguous ordering
-     * Bad: ``a + b + c``
-     * OK: ``(a + b) + c``
+* No ambiguous ordering
 
-   * No double divisions:
-     * Bad: ``a / (b + c / d)``
-     * Better: ``a * d / (b * d + c)``
+  * Bad: ``a + b + c``
 
-   * Use "inverse" variables for repeated divisions:
-     * ``Iarea = 1.0 / area``
-     * ``u = a * Iarea;    v = b * Iarea``
+  * OK: ``(a + b) + c``
 
+* Avoid intrinsics
 
-.. Avoid Intrinsics
-   ================
+   * ``sum()`` is ambiguous; what is the order?
 
-   ``sum()`` is ambiguous: what is the order?
+   * use ``reproducing_sum()``
 
-   * Use ``reproducing_sum()``
-
-   ``sin()``, ``exp()``, are also problematic, avoid where possible.
+   * Avoid ``sin()``, ``exp()``, etc
 
 
-Debug Mode
-==========
+Bit Repro Debugging
+===================
 
 In ``MOM_input``::
 
@@ -142,6 +134,8 @@ This enables checksums in the output::
   h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h
 
 Send to stderr (expect a *lot* of output!)
+
+(See also ``DIAG_AS_CHKSUM``)
 
 
 Debug Syntax
@@ -173,8 +167,19 @@ Produces call tree (and other info):
    :code:
 
 
-Exercise 1
-==========
+Dimensional Consistency
+=======================
+
+
+
+
+Rotational Consistency
+======================
+
+
+
+Exercise
+========
 
 Check out fork and compile:
 
@@ -196,4 +201,4 @@ Run with 1 and 4 CPUs
    cp ocean.stats ocean.stats.p4
    diff ocean.stats.p1 ocean.stats.p4
 
-Find the issue and submit a fix (?)
+Do they agree?

@@ -306,3 +306,13 @@ GitHub merges are "non-fast-forward".   They create a *merge commit*.
 But FF merge is not always possible.
 
 
+Summary
+=======
+
+* Use git to manage your contributions
+
+* Work on branches, submit back to ``dev/gfdl``
+
+* Commits should be *meaningful*
+
+* Verified by automated testing

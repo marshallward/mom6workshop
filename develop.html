@@ -128,14 +128,31 @@ enddo ; enddo</code></pre></li>
 <p><em>Even floating point!</em></p>
 <p>Verification is based on <code>ocean.stats</code>:</p>
 <pre><code>Step,       Day,  Truncs,      Energy/Mass,      Maximum CFL,  Mean sea level,   Total Mass,    Frac Mass Err
-       [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
-0,       0.000,     0, En 3.3361965169932362E-01, CFL  0.01092, SL -0.0000E+00, Mass 3.95904E+18, Me  0.00E+00
+          [days]                 [m2 s-2]           [Nondim]        [m]             [kg]           [Nondim]
+  0,       0.000,     0, En 3.3361965169932362E-01, CFL  0.01092, SL -0.0000E+00, Mass 3.95904E+18, Me  0.00E+00
 144,       1.000,     0, En 3.3113616621947212E-01, CFL  0.01064, SL -0.0000E+00, Mass 3.95904E+18, Me -4.25E-18</code></pre>
 <p>Energy/Mass is machine-precision and reproducible</p>
 </section>
 
-<section id="debug-mode" class="title-slide slide level1">
-<h1>Debug Mode</h1>
+<section id="numerical-style" class="title-slide slide level1">
+<h1>Numerical "style"</h1>
+<ul>
+<li><p>No ambiguous ordering</p>
+<ul>
+<li>Bad: <code>a + b + c</code></li>
+<li>OK: <code>(a + b) + c</code></li>
+</ul></li>
+<li><p>Avoid intrinsics</p>
+<ul>
+<li><code>sum()</code> is ambiguous; what is the order?</li>
+<li>use <code>reproducing_sum()</code></li>
+<li>Avoid <code>sin()</code>, <code>exp()</code>, etc</li>
+</ul></li>
+</ul>
+</section>
+
+<section id="bit-repro-debugging" class="title-slide slide level1">
+<h1>Bit Repro Debugging</h1>
 <p>In <code>MOM_input</code>:</p>
 <pre><code>DEBUG=True</code></pre>
 <p>This enables checksums in the output:</p>
@@ -146,6 +163,7 @@ v-point: c=         0 sw=         0 se=         0 nw=         0 ne=         0 v 
 h-point: mean=   1.0000000000000000E+03 min=   2.0022236368437586E+02 max=   1.7997776363156240E+03 Beginning of step_MOM  h
 h-point: c=    272640 sw=    274800 se=    274800 nw=    274740 ne=    274740 Beginning of step_MOM  h</code></pre>
 <p>Send to stderr (expect a <em>lot</em> of output!)</p>
+<p>(See also <code>DIAG_AS_CHKSUM</code>)</p>
 </section>
 
 <section id="debug-syntax" class="title-slide slide level1">
@@ -225,8 +243,18 @@ NOTE: callTree: &lt;--- Main loop
 </code></pre>
 </section>
 
-<section id="exercise-1" class="title-slide slide level1">
-<h1>Exercise 1</h1>
+<section id="dimensional-consistency" class="title-slide slide level1">
+<h1>Dimensional Consistency</h1>
+
+</section>
+
+<section id="rotational-consistency" class="title-slide slide level1">
+<h1>Rotational Consistency</h1>
+
+</section>
+
+<section id="exercise" class="title-slide slide level1">
+<h1>Exercise</h1>
 <p>Check out fork and compile:</p>
 <pre class="fortran"><code>cd MOM6-examples/src/MOM6
 git fetch
@@ -239,7 +267,7 @@ cp ocean.stats ocean.stats.p1
 mpirun -np 4 ../../build/ocean_only/MOM6
 cp ocean.stats ocean.stats.p4
 diff ocean.stats.p1 ocean.stats.p4</code></pre>
-<p>Find the issue and submit a fix (?)</p>
+<p>Do they agree?</p>
 </section>
     </div>
   </div>
