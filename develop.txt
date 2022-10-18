@@ -154,18 +154,59 @@ Produces call tree (and other info):
 Exercise
 ========
 
-Check out fork and compile:
+Check out fork and compile::
 
-.. code:: fortran
+   cd MOM6-examples/src/MOM6
+   git fetch
+   git checkout mysterious-crash
+   # You remember how to compile, right?
+
+Run Phillips 2-layer::
+
+   cd ../../ocean_only/Phillips_2layer
+   ../../build/ocean_only/MOM6
+
+What do you see?
+
+
+E.1 Output
+----------
+
+Segmentation fault, no symbols:
+
+.. include:: doc/crash.out
+   :code:
+
+
+E.1 Hint
+--------
+
+Rebuild with ``DEBUG``::
+
+   $ make clean
+   $ make DEBUG=1 -j
+
+This restores symbols:
+
+``-g``
+   Symbol tables
+
+``-fbacktrace``
+   Enable traceback (the report at the end)
+
+Now check the symbols
+
+
+Exercise
+========
+
+Another fork to check out::
 
    cd MOM6-examples/src/MOM6
    git fetch
    git checkout demo-layout-issue
-   # You remember how to compile, right?
 
-Run with 1 and 4 CPUs
-
-.. code:: fortran
+Run with 1 and 4 CPUs::
 
    cd ../../ocean_only/Phillips_2layer
    mpirun -np 1 ../../build/ocean_only/MOM6

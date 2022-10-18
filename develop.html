@@ -248,15 +248,82 @@ NOTE: callTree: &lt;--- Main loop
 </code></pre>
 </section>
 
+<section>
 <section id="exercise" class="title-slide slide level1">
 <h1>Exercise</h1>
 <p>Check out fork and compile:</p>
-<pre class="fortran"><code>cd MOM6-examples/src/MOM6
+<pre><code>cd MOM6-examples/src/MOM6
 git fetch
-git checkout demo-layout-issue
+git checkout mysterious-crash
 # You remember how to compile, right?</code></pre>
-<p>Run with 1 and 4 CPUs</p>
-<pre class="fortran"><code>cd ../../ocean_only/Phillips_2layer
+<p>Run Phillips 2-layer:</p>
+<pre><code>cd ../../ocean_only/Phillips_2layer
+../../build/ocean_only/MOM6</code></pre>
+<p>What do you see?</p>
+</section>
+<section id="e.1-output" class="slide level2">
+<h2>E.1 Output</h2>
+<p>Segmentation fault, no symbols:</p>
+<pre class="" data-code=""><code>MOM Day       0.000      0: En 3.336197E-01, MaxCFL  0.01092, Mass 3.959040000000E+18
+    Total Energy: 43B25478EC07BAB8  1.3208135458636902E+18
+    Total Mass:   3.9590400000000000E+18, Change:   0.0000000000000000E+00 Error:  0.00000E+00 ( 0.0E+00)
+NOTE: callTree:    &lt;--- finish_MOM_initialization()
+NOTE: callTree:    ---&gt; step_MOM(), MOM.F90
+NOTE: callTree:       loop DT cycles (step_MOM) n=       1
+NOTE: callTree:          o done with set_viscous_BBL (step_MOM)
+NOTE: callTree:          ---&gt; step_MOM_dyn_split_RK2(), MOM_dynamics_split_RK2.F90
+NOTE: callTree:             o done with PressureForce (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with vertvisc_coef (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity[BT_cont] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             ---&gt; btstep(), MOM_barotropic.F90
+NOTE: btstep is using a dynamic barotropic timestep of 7.500000E+01 seconds, max 8.529637E+01.
+NOTE: callTree:             &lt;--- btstep()
+NOTE: callTree:             o done with vertvisc (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with continuity (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with btcalc[BT_cont_BT_thick] (step_MOM_dyn_split_RK2)
+NOTE: callTree:             o done with horizontal_viscosity (step_MOM_dyn_split_RK2)
+
+Program received signal SIGSEGV: Segmentation fault - invalid memory reference.
+
+Backtrace for this error:
+#0  0x7fe847a6f9ff in ???
+#1  0x55893a0b6dad in ???
+#2  0x55893a086ee6 in ???
+#3  0x55893a439281 in ???
+#4  0x55893a39b4a0 in ???
+#5  0x558939e76d0e in ???
+#6  0x7fe847a5a28f in ???
+#7  0x7fe847a5a349 in ???
+#8  0x558939e76d44 in _start
+	at ../sysdeps/x86_64/start.S:115
+#9  0xffffffffffffffff in ???
+Segmentation fault (core dumped)
+</code></pre>
+</section>
+<section id="e.1-hint" class="slide level2">
+<h2>E.1 Hint</h2>
+<p>Rebuild with <code>DEBUG</code>:</p>
+<pre><code>$ make clean
+$ make DEBUG=1 -j</code></pre>
+<p>This restores symbols:</p>
+<dl>
+<dt><code>-g</code></dt>
+<dd><p>Symbol tables</p>
+</dd>
+<dt><code>-fbacktrace</code></dt>
+<dd><p>Enable traceback (the report at the end)</p>
+</dd>
+</dl>
+<p>Now check the symbols</p>
+</section></section>
+<section id="exercise-1" class="title-slide slide level1">
+<h1>Exercise</h1>
+<p>Another fork to check out:</p>
+<pre><code>cd MOM6-examples/src/MOM6
+git fetch
+git checkout demo-layout-issue</code></pre>
+<p>Run with 1 and 4 CPUs:</p>
+<pre><code>cd ../../ocean_only/Phillips_2layer
 mpirun -np 1 ../../build/ocean_only/MOM6
 cp ocean.stats ocean.stats.p1
 mpirun -np 4 ../../build/ocean_only/MOM6
