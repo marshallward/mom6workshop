@@ -107,6 +107,25 @@
 <p>Also tests for documentation, MacOS support, etc</p>
 </section>
 
+<section id="autoconf" class="title-slide slide level1">
+<h1>Autoconf</h1>
+<p><code>.testing</code> is based on Autoconf; let's try it:</p>
+<pre><code># Build FMS
+cd ac/deps
+make -j
+
+# Create ./configure
+cd ../
+autoreconf -if
+
+# Build MOM6
+cd ..
+mkdir build
+cd build
+../ac/configure
+make -j</code></pre>
+</section>
+
 <section id="reproducibility" class="title-slide slide level1">
 <h1>Reproducibility</h1>
 <p>Numerical results must reproduce:</p>
@@ -227,21 +246,6 @@ NOTE: callTree:       &lt;--- extract_surface_sfc_state()
 NOTE: callTree:    &lt;--- step_MOM()
 NOTE: callTree: &lt;--- Main loop
 </code></pre>
-</section>
-
-<section id="dimensional-consistency" class="title-slide slide level1">
-<h1>Dimensional Consistency</h1>
-
-</section>
-
-<section id="rotational-consistency" class="title-slide slide level1">
-<h1>Rotational Consistency</h1>
-
-</section>
-
-<section id="test-suite-revisited" class="title-slide slide level1">
-<h1>Test Suite (revisited)</h1>
-
 </section>
 
 <section id="exercise" class="title-slide slide level1">

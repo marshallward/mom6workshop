@@ -33,6 +33,35 @@ Regression  Answer changes
 Also tests for documentation, MacOS support, etc
 
 
+.. Dimensional Consistency
+   =======================
+
+
+   Rotational Consistency
+   ======================
+
+
+Autoconf
+========
+
+``.testing`` is based on Autoconf; let's try it::
+
+   # Build FMS
+   cd ac/deps
+   make -j
+
+   # Create ./configure
+   cd ../
+   autoreconf -if
+
+   # Build MOM6
+   cd ..
+   mkdir build
+   cd build
+   ../ac/configure
+   make -j
+
+
 Reproducibility
 ===============
 
@@ -120,21 +149,6 @@ Produces call tree (and other info):
 
 .. include:: doc/calltree.out
    :code:
-
-
-Dimensional Consistency
-=======================
-
-
-
-Rotational Consistency
-======================
-
-
-
-Test Suite (revisited)
-======================
-
 
 
 Exercise
