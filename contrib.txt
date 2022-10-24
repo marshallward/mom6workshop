@@ -135,6 +135,8 @@ Add file::
 
    $ git add src/core/MOM_CoriolisAdv.F90
 
+(Your file may be different)
+
 
 Commit Changes
 ==============

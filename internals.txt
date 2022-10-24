@@ -37,7 +37,7 @@ Directory         Description
 Directory               Driver
 ===================     =========================
 ``solo_driver``         Ocean-only
-``ice_solo_driver``     Ice-ocean (MOM6-SIS2)
+``ice_solo_driver``     Ice shelf model
 ``FMS_cap``             GFDL (FMS) coupler
 ``nuopc_cap``           NUOPC coupler (CESM, UFS)
 ``mct_cap``             MCT coupler

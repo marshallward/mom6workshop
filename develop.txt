@@ -44,7 +44,9 @@ Also tests for documentation, MacOS support, etc
 Autoconf
 ========
 
-``.testing`` is based on Autoconf; let's try it::
+``.testing`` is based on Autoconf; let's try it:
+
+.. code:: sh
 
    # Build FMS
    cd ac/deps
@@ -154,14 +156,18 @@ Produces call tree (and other info):
 Exercise
 ========
 
-Check out fork and compile::
+Check out fork and compile:
+
+.. code:: sh
 
    cd MOM6-examples/src/MOM6
    git fetch
    git checkout mysterious-crash
    # You remember how to compile, right?
 
-Run Phillips 2-layer::
+Run Phillips 2-layer:
+
+.. code:: sh
 
    cd ../../ocean_only/Phillips_2layer
    ../../build/ocean_only/MOM6
